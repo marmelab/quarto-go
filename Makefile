@@ -6,7 +6,7 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 BIN = docker run \
-	--interactive \
+	-it \
 	--rm \
 	-v "${PWD}:/code" \
 	--name quarto-go \
@@ -16,7 +16,7 @@ install: ## Install docker environnement
 	docker build --tag=quarto-go .
 
 run: ## Start the game
-	 $(BIN) go run ./src/quarto.go
+	 $(BIN) go run ./src/quarto/main.go
 
 test: ## Test the code
 	$(BIN) go test -v ./src/tests
