@@ -32,4 +32,3 @@ Runs code linter on the project
 ```
 make lint
 ```
->>>>>>> project creation for quarto-go

@@ -19,12 +19,12 @@ run: ## Start the game
 	 $(BIN) go run ./src/quarto.go
 
 test: ## Test the code
-	$(BIN) go test ./src/tests
+	$(BIN) go test -v ./src/tests
 
 test-local:
-	go test ./src/tests
+	go test -v ./src/tests
 
 lint: ## Check the code syntax and rules
-	$(BIN) golint ./src
+	$(BIN) gofmt -w ./src
 
 .DEFAULT_GOAL := help

@@ -1,5 +1,7 @@
 package main
+
 import "fmt"
+
 func main() {
-    fmt.Println("Starting Quarto-go")
+	fmt.Println("Starting Quarto-go")
 }
