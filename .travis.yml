@@ -1,0 +1,13 @@
+# https://travis-ci.com/marmelab/quarto-go
+
+language: golang
+
+python: "1.8"
+
+install: make install-local
+
+script: make test-local
+
+branches:
+  only:
+    - master

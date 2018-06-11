@@ -20,6 +20,10 @@ run: ## Start the game
 
 test: ## Test the code
 	$(BIN) go test ./src/tests
+
+test-local:
+	go test ./src/tests
+
 lint: ## Check the code syntax and rules
 	$(BIN) golint ./src
 
