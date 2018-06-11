@@ -1,5 +1,6 @@
 package game
 
+// GridSize is the Size of a grid
 const GridSize = 4
 
 // State define data for a game state
@@ -44,7 +45,7 @@ func InitListOfRemainingPieces(state State) []int {
 
 	for i := 0; i < GridSize; i++ {
 		for j := 0; j < GridSize; j++ {
-			var index = indexOf(piecesList, state.Grid[i][j])
+			var index = IndexOf(piecesList, state.Grid[i][j])
 			if index >= 0 {
 				piecesList = append(piecesList[:index], piecesList[index+1:]...)
 			}
@@ -63,7 +64,8 @@ func InitListOfAllPieces(state State) []int {
 	return piecesList
 }
 
-func contains(s []int, e int) bool {
+// Contains returns the presence of an element in a list
+func Contains(s []int, e int) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -72,7 +74,8 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-func indexOf(s []int, e int) int {
+// IndexOf returns index of an element in a list
+func IndexOf(s []int, e int) int {
 	for i := 0; i < len(s); i++ {
 		if s[i] == e {
 			return i
