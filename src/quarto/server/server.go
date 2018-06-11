@@ -1,23 +1,23 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
-    "github.com/gorilla/mux"
-    "io/ioutil"
+	"github.com/gorilla/mux"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-    "strconv"
-	//"encoding/json"
 	"quarto/game"
+	"strconv"
 )
 
 // Start launch the server
 func Start() {
 
 	router := mux.NewRouter().StrictSlash(true)
-    router.HandleFunc("/suggestMove", SuggestMove).
-        Methods("POST")
+	router.HandleFunc("/suggestMove", SuggestMove).
+		Methods("POST")
 
 	port := GetListeningPort()
 	fmt.Println("Server started on port : " + port)
@@ -46,32 +46,34 @@ func GetListeningPort() string {
 
 // SuggestMove wait for a new move request and return a move
 func SuggestMove(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
-    vars := mux.Vars(r)
+	b, err := ioutil.ReadAll(r.Body)
 
-    fmt.Fprintln(w, vars)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 
-    //var m Member
-    b, _ := ioutil.ReadAll(r.Body)
-    fmt.Fprintln(w, b)
-    //json.Unmarshal(b, &m)
-    //members = append(members, m)
-    //j, _ := json.Marshal(m)
-    //w.Write(j)
-    //j, _ := json.Marshal(members)
-    //login := r.FormValue("login")
-
-	fmt.Fprintln(w, FromStateToJSON(game.DoAMove(FromJSONToState("toto"))))
+	w.Write(FromStateToJSON(game.DoAMove(FromJSONToState(b))))
 }
 
 // FromJSONToState convert a json data into a game state
-func FromJSONToState(j string) game.State {
-	var grid [4][4]int
-	return game.State{grid, 20}
+func FromJSONToState(b []byte) game.State {
+	var state game.State
+	err := json.Unmarshal(b, &state)
+	if err != nil {
+		//return
+	}
+	return state
 }
 
-// FromStateToJSON convert a game state into a json data 
-func FromStateToJSON(state game.State) string {
-	return "toto"
+// FromStateToJSON convert a game state into a json data
+func FromStateToJSON(state game.State) []byte {
+	output, err := json.Marshal(state)
+	if err != nil {
+		//return
+	}
+	return output
 }
