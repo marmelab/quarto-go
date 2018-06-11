@@ -1,10 +1,10 @@
 package game
 
-const gridSize = 4
+const GridSize = 4
 
 // State define data for a game state
 type State struct {
-	Grid  [gridSize][gridSize]int
+	Grid  [GridSize][GridSize]int
 	Piece int
 }
 
@@ -18,15 +18,17 @@ func DoAMove(state State) State {
 
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
 func PlacePieceOnGrid(state State) State {
-	for i := 0; i < gridSize; i++ {
-		for j := 0; j < gridSize; j++ {
-			if state.Grid[i][j] == 0 {
-				state.Grid[i][j] = state.Piece
-				state.Piece = 0
-				return state
-			}
-		}
-	}
+    if state.Piece > 0 {
+        for i := 0; i < GridSize; i++ {
+            for j := 0; j < GridSize; j++ {
+                if state.Grid[i][j] == 0 {
+                    state.Grid[i][j] = state.Piece
+                    state.Piece = 0
+                    return state
+                }
+            }
+        }
+    }
 	return state
 }
 
@@ -40,8 +42,8 @@ func ChooseNewPiece(state State) State {
 func InitListOfRemainingPieces(state State) []int {
 	var piecesList = InitListOfAllPieces(state)
 
-	for i := 0; i < gridSize; i++ {
-		for j := 0; j < gridSize; j++ {
+	for i := 0; i < GridSize; i++ {
+		for j := 0; j < GridSize; j++ {
 			var index = indexOf(piecesList, state.Grid[i][j])
 			if index >= 0 {
 				piecesList = append(piecesList[:index], piecesList[index+1:]...)
@@ -55,7 +57,7 @@ func InitListOfRemainingPieces(state State) []int {
 // InitListOfAllPieces generate a list of all pieces
 func InitListOfAllPieces(state State) []int {
 	var piecesList []int
-	for i := 0; i < gridSize*gridSize; i++ {
+	for i := 0; i < GridSize*GridSize; i++ {
 		piecesList = append(piecesList, i+1)
 	}
 	return piecesList
