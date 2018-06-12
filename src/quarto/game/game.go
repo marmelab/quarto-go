@@ -105,10 +105,11 @@ func GetAllPiecesList(state State) []int {
 // IsValid return false if the state is not acceptable
 func IsValid(state State) bool {
 	size := GetGridSize(state)
+	var piecesList = GetAllPiecesList(state)
 	if (len(state.Grid) != size) {
 		return false
 	}
-	if (state.Piece < 0 || state.Piece > (size * size)) {
+	if (!IsValidPiece(state.Piece,size)) {
 		return false
 	}
 	for i := 0; i < size; i++ {
@@ -116,13 +117,50 @@ func IsValid(state State) bool {
 			return false
 		}
 		for j := 0; j < size; j++ {
-			if (state.Grid[i][j] < 0 || state.Grid[i][j] > (size * size)) {
+			if (!IsValidBox(state.Grid[i][j], size, state.Piece)) {
 				return false
 			}
-			if (state.Piece > 0 && state.Grid[i][j] == state.Piece) {
-				return false
+			if (state.Grid[i][j] > 0) {
+				var pieceIndex = underscore.FindIndex(piecesList, func(n, _ int) bool {
+					return n == state.Grid[i][j]
+				})
+				if (pieceIndex < 0) {
+					return false
+				}
+				piecesList = append(piecesList[:pieceIndex], piecesList[pieceIndex+1:]...)
 			}
 		}
+	}
+	
+	if (!IsValidMove(state.Move, size)) {
+		return false
+	}
+	return true
+}
+
+// IsValidPiece return false if the piace number is not acceptable
+func IsValidPiece(piece int, size int) bool {
+	return piece >= 0 && piece <= (size * size)
+}
+
+// IsValidBox return false if the box number is not acceptable
+func IsValidBox(box int, size int, piece int) bool {
+	if (box < 0 || box > (size * size)) {
+		return false
+	}
+	if (piece > 0 && box == piece) {
+		return false
+	}
+	return true
+}
+
+// IsValidMove return false if the move is not acceptable
+func IsValidMove(move [2]int, size int) bool {
+	if (move[0] < 0 || move[0] >= size) {
+		return false
+	}
+	if (move[1] < 0 || move[1] >= size) {
+		return false
 	}
 	return true
 }

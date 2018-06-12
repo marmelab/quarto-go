@@ -114,3 +114,66 @@ func TestIsValidShouldReturnFalseWithBadState(t *testing.T) {
 		t.Errorf("State shouldn't be valid")
 	}
 }
+
+func TestIsValidShouldReturnFalseWithBadStateWithDuplicateValue(t *testing.T) {
+	var state = game.GetNewState(6)
+	state.Grid[3][0] = 21
+	state.Grid[2][4] = 21
+	if game.IsValid(state) {
+		t.Errorf("State shouldn't be valid")
+	}
+}
+
+func TestIsValidPieceShouldReturnTrueWhenPieceNumberIsInGridSize(t *testing.T) {
+	if !game.IsValidPiece(2, 6) {
+		t.Errorf("Piece id should be valid (2 is in [0, 6*6])")
+	}
+}
+
+func TestIsValidPieceShouldReturnFalseWhenPieceNumberIsNotInGridSize(t *testing.T) {
+	if game.IsValidPiece(41, 6) {
+		t.Errorf("Piece id shouldn't be valid (41 is not in [0, 6*6])")
+	}
+}
+
+func TestIsValidPieceShouldReturnFalseWhenPieceNumberIsUnderZero(t *testing.T) {
+	if game.IsValidPiece(-1, 6) {
+		t.Errorf("Piece id shouldn't be valid (-1 is not in [0, 6*6])")
+	}
+}
+
+func TestIsValidPieceShouldReturnTrueWhenPieceNumberIsZero(t *testing.T) {
+	if !game.IsValidPiece(0, 5) {
+		t.Errorf("Piece id should be valid (0 is not in [0, 5*5])")
+	}
+}
+
+func TestIsValidMoveShouldReturnTrueWhenMoveCoordinatesAreInGridSize(t *testing.T) {
+	if !game.IsValidMove([2]int{2,3}, 4) {
+		t.Errorf("Move should be valid ([2,3] is a good coordinate in 4*4 grid)")
+	}
+}
+
+func TestIsValidMoveShouldReturnFalseWhenMoveCoordinatesAreNotInGridSize(t *testing.T) {
+	if game.IsValidMove([2]int{2,3}, 3) {
+		t.Errorf("Move shouldn't be valid ([2,3] is a bad coordinate in 3*3 grid)")
+	}
+}
+
+func TestIsValidBoxShouldReturnFalseWhenPieceNumberAreAlreadyUsed(t *testing.T) {
+	if game.IsValidBox(3, 4, 3) {
+		t.Errorf("Move shouldn't be valid (piece 3 is already used)")
+	}
+}
+
+func TestIsValidBoxShouldReturnFalseWhenPieceNumberAreNotInGridSize(t *testing.T) {
+	if game.IsValidBox(21, 4, 3) {
+		t.Errorf("Move shouldn't be valid (piece 21 doesn't exists one 4*4 grid)")
+	}
+}
+
+func TestIsValidBoxShouldReturnTrueWhenPieceNumberAreInGridSizeAndFree(t *testing.T) {
+	if !game.IsValidBox(21, 5, 3) {
+		t.Errorf("Move should be valid (piece 21 exists one 5*5 grid)")
+	}
+}
