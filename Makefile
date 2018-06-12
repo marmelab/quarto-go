@@ -24,9 +24,6 @@ run: ## Start the game
 test: ## Test the code
 	$(BIN) go test -v ./src/tests
 
-test-local:
-	cd ./src/tests/ && go test -run ''
-
 lint: ## Check the code syntax and rules
 	$(BIN) gofmt -w ./src
 
