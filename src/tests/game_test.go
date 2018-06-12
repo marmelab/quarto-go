@@ -6,10 +6,10 @@ import (
 	"testing"
 )
 
-func testGetNewStateShouldReturnAnEmptyState(t *testing.T) {
+func TestGetNewStateShouldReturnAnEmptyState(t *testing.T) {
 	var state = game.PlayTurn(game.GetNewState(4))
 	var referenceState = game.GetNewState(4)
-	if reflect.DeepEqual(state.Grid,referenceState.Grid) {
+	if !reflect.DeepEqual(state.Grid, referenceState.Grid) {
 		t.Errorf("Grid should be empty at first move")
 	}
 	if state.Piece == 0 {
@@ -17,11 +17,10 @@ func testGetNewStateShouldReturnAnEmptyState(t *testing.T) {
 	}
 }
 
-
-func testPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *testing.T) {
+func TestPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *testing.T) {
 	var state = game.PlayTurn(game.GetNewState(4))
 	var referenceState = game.GetNewState(4)
-	if reflect.DeepEqual(state.Grid,referenceState.Grid) {
+	if !reflect.DeepEqual(state.Grid, referenceState.Grid) {
 		t.Errorf("Grid should be empty at first move")
 	}
 	if state.Piece == 0 {
@@ -29,7 +28,7 @@ func testPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *test
 	}
 }
 
-func testPlacePieceOnGridShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
+func TestPlacePieceOnGridShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Piece = 3
 	state = game.PlacePieceOnGrid(state)
@@ -41,8 +40,8 @@ func testPlacePieceOnGridShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
 	}
 }
 
-func testChooseNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
-	var state = game.State{}
+func TestChooseNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
+	var state = game.GetNewState(4)
 	state.Grid[0][0] = 1
 	state = game.ChooseNewPiece(state)
 	if state.Piece == 0 {
@@ -53,7 +52,7 @@ func testChooseNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
 	}
 }
 
-func testInitListOfRemainingPiecesShouldReturnAGridSizedZeroFilledListWhenCalledFirst(t *testing.T) {
+func TestInitListOfRemainingPiecesShouldReturnAGridSizedZeroFilledListWhenCalledFirst(t *testing.T) {
 	var list = game.GetRemainingPiecesListFromState(game.State{})
 	var referenceList []int
 	for i := 0; i < 16; i++ {
@@ -64,7 +63,7 @@ func testInitListOfRemainingPiecesShouldReturnAGridSizedZeroFilledListWhenCalled
 	}
 }
 
-func testInitListOfAllPiecesShouldReturnAGridSizedZeroFilledList(t *testing.T) {
+func TestInitListOfAllPiecesShouldReturnAGridSizedZeroFilledList(t *testing.T) {
 	var list = game.GetAllPiecesList(game.GetNewState(4))
 	var referenceList []int
 	for i := 0; i < 16; i++ {

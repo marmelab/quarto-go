@@ -10,7 +10,6 @@ type State struct {
 	Piece int
 }
 
-
 // GetNewState return a blanck state of defined size
 func GetNewState(size int) State {
 	newState := State{}
