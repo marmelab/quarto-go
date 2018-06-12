@@ -78,14 +78,80 @@ func ChooseWinningtPositionForPiece(state State) [2]int{
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if state.Grid[i][j] == 0 {
-				coord[0] = i
-				coord[1] = j
-				return coord
+				if (IsWinningPosition(j,i,state, size)) {
+					coord[0] = i
+					coord[1] = j
+					return coord
+				}
 			}
 		}
 	}
 	return coord
 }
+
+// IsWinningPosition return true if the piece placed at these coordinates make a winning situation
+func IsWinningPosition(x int, y int, state State, size int) bool {
+	testState := CopyState(state)
+	testState.Grid[x][y] = testState.Piece
+	if (IsWinningLine(GetPiecesRaw(x,y,testState.Grid, size))) {
+		return true
+	}
+	if (IsWinningLine(GetPiecesColumn(x,y,testState.Grid, size))) {
+		return true
+	}
+	if (IsWinningLine(GetPiecesSlashDiag(x,y,testState.Grid, size))) {
+		return true
+	}
+	if (IsWinningLine(GetPiecesBackSlashDiag(x,y,testState.Grid, size))) {
+		return true
+	}
+	return false
+}
+
+// GetPiecesRaw return an array of the raw of pieces aligned in [x,y] coordinates
+func GetPiecesRaw(x int, y int, grid [][]int, size int) []int {
+	return grid[y]
+}
+
+// GetPiecesColumn return an array of the column of pieces aligned in [x,y] coordinates
+func GetPiecesColumn(x int, y int, grid [][]int, size int) []int {
+	piecesLine := []int{}
+	for i := 0; i < size; i++ {
+		piecesLine = append(piecesLine, grid[i][x])
+	}
+	return piecesLine
+}
+
+// GetPiecesSlashDiag return an array of the diag (slash oriented) of pieces aligned in [x,y] coordinates
+func GetPiecesSlashDiag(x int, y int, grid [][]int, size int) []int {
+	piecesLine := []int{}
+	if (x == y) {
+		for i := 0; i < size; i++ {
+			piecesLine = append(piecesLine, grid[i][i])
+		}
+	}
+	return piecesLine
+}
+
+// GetPiecesBackSlashDiag return an array of the diag (backslash oriented) of pieces aligned in [x,y] coordinates
+func GetPiecesBackSlashDiag(x int, y int, grid [][]int, size int) []int {
+	piecesLine := []int{}
+	if (x == size - y - 1) {
+		for i := 0; i < size; i++ {
+			piecesLine = append(piecesLine, grid[i][size - i - 1])
+		}
+	}
+	return piecesLine
+}
+
+// IsWinningLine return true if all piece in array makes a winning situation when aligned
+func IsWinningLine(piecesLine []int) bool {
+	if (len(piecesLine) == 0) {
+		return false
+	}
+	return false
+}
+
 
 // ChooseFirstPositionForPiece return first available coordinates to place the next piece
 func ChooseFirstPositionForPiece(state State) [2]int{
