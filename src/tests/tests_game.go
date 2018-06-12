@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func testDoAMoveShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *testing.T) {
-	var state = game.DoAMove(game.State{})
+func testPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *testing.T) {
+	var state = game.PlayTurn(game.State{})
 	var referenceState = game.State{}
 	if state.Grid != referenceState.Grid {
 		t.Errorf("Grid should be empty at first move")

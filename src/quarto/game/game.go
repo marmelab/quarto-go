@@ -25,8 +25,8 @@ func CopyState(state State) State {
 	return newState
 }
 
-// DoAMove return the next move for given grid
-func DoAMove(state State) State {
+// PlayTurn return the next move for given grid
+func PlayTurn(state State) State {
 	newState := PlacePieceOnGrid(state)
 	return ChooseNewPiece(newState)
 }

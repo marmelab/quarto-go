@@ -63,7 +63,7 @@ func SuggestMove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serializedState, err := serializer.FromStateToJSON(game.DoAMove(state))
+	serializedState, err := serializer.FromStateToJSON(game.PlayTurn(state))
 
 	if err != nil {
 		http.Error(w, err.Error(), 500)
