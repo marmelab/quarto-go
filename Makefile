@@ -1,5 +1,8 @@
 MAKEFLAGS += --silent
 
+UID = $(shell id -u)
+GID = $(shell id -g)
+
 .PHONY: help install run lint
 
 help:
@@ -8,7 +11,9 @@ help:
 BIN = docker run \
 	-it \
 	--rm \
+	--user "${UID}:${GID}" \
 	-v "${PWD}:/go" \
+	-v "/etc/passwd:/etc/passwd:ro" \
 	-p "8080:8080" \
 	--name quarto-go \
 	quarto-go
