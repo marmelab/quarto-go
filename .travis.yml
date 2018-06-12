@@ -4,9 +4,9 @@ language: go
 
 go: "1.8"
 
-install: 
-  go get github.com/gorilla/mux
-	go get github.com/ahl5esoft/golang-underscore
+install:
+  - go get github.com/gorilla/mux
+  - go get github.com/ahl5esoft/golang-underscore
 
 script: GOPATH=$(pwd) && make test-local
 
