@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -9,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"quarto/game"
+	"quarto/serializer"
 	"strconv"
 )
 
@@ -46,34 +46,29 @@ func GetListeningPort() string {
 
 // SuggestMove wait for a new move request and return a move
 func SuggestMove(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 
 	b, err := ioutil.ReadAll(r.Body)
 
-	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	w.Write(FromStateToJSON(game.DoAMove(FromJSONToState(b))))
-}
+	state, err := serializer.FromJSONToState(b)
 
-// FromJSONToState convert a json data into a game state
-func FromJSONToState(b []byte) game.State {
-	var state game.State
-	err := json.Unmarshal(b, &state)
 	if err != nil {
-		//return
+		http.Error(w, err.Error(), 500)
+		return
 	}
-	return state
-}
 
-// FromStateToJSON convert a game state into a json data
-func FromStateToJSON(state game.State) []byte {
-	output, err := json.Marshal(state)
+	serializedState, err := serializer.FromStateToJSON(game.DoAMove(state))
+
 	if err != nil {
-		//return
+		http.Error(w, err.Error(), 500)
+		return
 	}
-	return output
+
+	w.Write(serializedState)
 }
