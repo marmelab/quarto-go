@@ -28,42 +28,41 @@ func CopyGrid(grid [][]int) [][]int {
 // IsWinningPosition return true if the piece placed at these coordinates make a winning situation
 func IsWinningPosition(x int, y int, grid [][]int, piece int) bool {
 	testGrid := CopyGrid(grid)
-	size := len(testGrid)
 	testGrid[x][y] = piece
-	if (IsWinningLine(GetPiecesRaw(x,y,testGrid, size))) {
+	if (IsWinningLine(GetPiecesRaw(x,y,testGrid))) {
 		return true
 	}
-	if (IsWinningLine(GetPiecesColumn(x,y,testGrid, size))) {
+	if (IsWinningLine(GetPiecesColumn(x,y,testGrid))) {
 		return true
 	}
-	if (IsWinningLine(GetPiecesSlashDiag(x,y,testGrid, size))) {
+	if (IsWinningLine(GetPiecesSlashDiag(x,y,testGrid))) {
 		return true
 	}
-	if (IsWinningLine(GetPiecesBackSlashDiag(x,y,testGrid, size))) {
+	if (IsWinningLine(GetPiecesBackSlashDiag(x,y,testGrid))) {
 		return true
 	}
 	return false
 }
 
 // GetPiecesRaw return an array of the raw of pieces aligned in [x,y] coordinates
-func GetPiecesRaw(x int, y int, grid [][]int, size int) []int {
+func GetPiecesRaw(x int, y int, grid [][]int) []int {
 	return grid[y]
 }
 
 // GetPiecesColumn return an array of the column of pieces aligned in [x,y] coordinates
-func GetPiecesColumn(x int, y int, grid [][]int, size int) []int {
+func GetPiecesColumn(x int, y int, grid [][]int) []int {
 	piecesLine := []int{}
-	for i := 0; i < size; i++ {
+	for i := 0; i < len(grid); i++ {
 		piecesLine = append(piecesLine, grid[i][x])
 	}
 	return piecesLine
 }
 
 // GetPiecesSlashDiag return an array of the diag (slash oriented) of pieces aligned in [x,y] coordinates
-func GetPiecesSlashDiag(x int, y int, grid [][]int, size int) []int {
+func GetPiecesSlashDiag(x int, y int, grid [][]int) []int {
 	piecesLine := []int{}
 	if (x == y) {
-		for i := 0; i < size; i++ {
+		for i := 0; i < len(grid); i++ {
 			piecesLine = append(piecesLine, grid[i][i])
 		}
 	}
@@ -71,11 +70,11 @@ func GetPiecesSlashDiag(x int, y int, grid [][]int, size int) []int {
 }
 
 // GetPiecesBackSlashDiag return an array of the diag (backslash oriented) of pieces aligned in [x,y] coordinates
-func GetPiecesBackSlashDiag(x int, y int, grid [][]int, size int) []int {
+func GetPiecesBackSlashDiag(x int, y int, grid [][]int) []int {
 	piecesLine := []int{}
-	if (x == size - y - 1) {
-		for i := 0; i < size; i++ {
-			piecesLine = append(piecesLine, grid[i][size - i - 1])
+	if (x == len(grid) - y - 1) {
+		for i := 0; i < len(grid); i++ {
+			piecesLine = append(piecesLine, grid[i][len(grid) - i - 1])
 		}
 	}
 	return piecesLine

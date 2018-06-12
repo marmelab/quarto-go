@@ -39,7 +39,7 @@ func TestGetNewStateShouldReturnAnEmptyState(t *testing.T) {
 	referenceState.Grid[3] = []int{0,0,0,0}
 	referenceState.Piece = 0
 	if !reflect.DeepEqual(state, referenceState) {
-		t.Errorf("Grid should be empty at first move")
+		t.Errorf("State should be empty at first move")
 	}
 }
 
