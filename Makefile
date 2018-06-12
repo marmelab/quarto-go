@@ -24,7 +24,7 @@ test: ## Test the code
 	$(BIN) go test -v ./src/tests
 
 test-local:
-	go test -v ./src/tests
+	cd ./src/tests/ && go test -run ''
 
 lint: ## Check the code syntax and rules
 	$(BIN) gofmt -w ./src
