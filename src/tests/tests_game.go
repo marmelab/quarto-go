@@ -3,14 +3,25 @@ package tests
 import (
 	"quarto/game"
 	"reflect"
-	"strconv"
 	"testing"
 )
 
+func testGetNewStateShouldReturnAnEmptyState(t *testing.T) {
+	var state = game.PlayTurn(game.GetNewState(4))
+	var referenceState = game.GetNewState(4)
+	if reflect.DeepEqual(state.Grid,referenceState.Grid) {
+		t.Errorf("Grid should be empty at first move")
+	}
+	if state.Piece == 0 {
+		t.Errorf("Piece should'nt be empty at first move")
+	}
+}
+
+
 func testPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *testing.T) {
-	var state = game.PlayTurn(game.State{})
-	var referenceState = game.State{}
-	if state.Grid != referenceState.Grid {
+	var state = game.PlayTurn(game.GetNewState(4))
+	var referenceState = game.GetNewState(4)
+	if reflect.DeepEqual(state.Grid,referenceState.Grid) {
 		t.Errorf("Grid should be empty at first move")
 	}
 	if state.Piece == 0 {
@@ -19,7 +30,7 @@ func testPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *test
 }
 
 func testPlacePieceOnGridShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
-	var state = game.State{}
+	var state = game.GetNewState(4)
 	state.Piece = 3
 	state = game.PlacePieceOnGrid(state)
 	if state.Grid[0][0] != 3 {
@@ -45,18 +56,21 @@ func testChooseNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
 func testInitListOfRemainingPiecesShouldReturnAGridSizedZeroFilledListWhenCalledFirst(t *testing.T) {
 	var list = game.GetRemainingPiecesListFromState(game.State{})
 	var referenceList []int
-	for i := 0; i < game.GridSize*game.GridSize; i++ {
+	for i := 0; i < 16; i++ {
 		referenceList = append(referenceList, 0)
 	}
 	if reflect.DeepEqual(list, referenceList) {
-		t.Errorf("Pieces list should have " + strconv.Itoa(game.GridSize*game.GridSize) + " 0 elements at the beginning")
+		t.Errorf("Pieces list should have 16 elements of 0 at the beginning")
 	}
 }
 
 func testInitListOfAllPiecesShouldReturnAGridSizedZeroFilledList(t *testing.T) {
-	var list = game.GetAllPiecesList(game.State{})
-	var referenceList [game.GridSize * game.GridSize]int
+	var list = game.GetAllPiecesList(game.GetNewState(4))
+	var referenceList []int
+	for i := 0; i < 16; i++ {
+		referenceList = append(referenceList, 0)
+	}
 	if reflect.DeepEqual(list, referenceList) {
-		t.Errorf("Pieces list should have " + strconv.Itoa(game.GridSize*game.GridSize) + " 0 elements")
+		t.Errorf("Pieces list should have 16 elements of 0")
 	}
 }

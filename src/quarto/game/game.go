@@ -4,20 +4,36 @@ import (
 	"github.com/ahl5esoft/golang-underscore"
 )
 
-// GridSize is the Size of a grid
-const GridSize = 4
-
 // State define data for a game state
 type State struct {
-	Grid  [GridSize][GridSize]int
+	Grid  [][]int
 	Piece int
+}
+
+
+// GetNewState return a blanck state of defined size
+func GetNewState(size int) State {
+	newState := State{}
+	for i := 0; i < size; i++ {
+		newState.Grid = append(newState.Grid, []int{})
+		for j := 0; j < size; j++ {
+			newState.Grid[i] = append(newState.Grid[i], 0)
+		}
+	}
+	return newState
+}
+
+// GetGridSize return the size of a grid in a state
+func GetGridSize(state State) int {
+	return len(state.Grid)
 }
 
 // CopyState create a new state copy of the parameter
 func CopyState(state State) State {
-	newState := State{}
-	for i := 0; i < GridSize; i++ {
-		for j := 0; j < GridSize; j++ {
+	size := GetGridSize(state)
+	newState := GetNewState(size)
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
 			newState.Grid[i][j] = state.Grid[i][j]
 		}
 	}
@@ -34,9 +50,10 @@ func PlayTurn(state State) State {
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
 func PlacePieceOnGrid(state State) State {
 	newState := CopyState(state)
+	size := GetGridSize(newState)
 	if newState.Piece > 0 {
-		for i := 0; i < GridSize; i++ {
-			for j := 0; j < GridSize; j++ {
+		for i := 0; i < size; i++ {
+			for j := 0; j < size; j++ {
 				if newState.Grid[i][j] == 0 {
 					newState.Grid[i][j] = newState.Piece
 					newState.Piece = 0
@@ -58,9 +75,9 @@ func ChooseNewPiece(state State) State {
 // GetRemainingPiecesListFromState generate a list of pieces not already in the grid
 func GetRemainingPiecesListFromState(state State) []int {
 	var piecesList = GetAllPiecesList(state)
-
-	for i := 0; i < GridSize; i++ {
-		for j := 0; j < GridSize; j++ {
+	size := GetGridSize(state)
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
 			var index = underscore.FindIndex(piecesList, func(n, _ int) bool {
 				return n == state.Grid[i][j]
 			})
@@ -76,7 +93,8 @@ func GetRemainingPiecesListFromState(state State) []int {
 // GetAllPiecesList generate a list of all pieces
 func GetAllPiecesList(state State) []int {
 	var piecesList []int
-	for i := 0; i < GridSize*GridSize; i++ {
+	size := GetGridSize(state)
+	for i := 0; i < size*size; i++ {
 		piecesList = append(piecesList, i+1)
 	}
 	return piecesList

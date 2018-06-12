@@ -14,7 +14,6 @@ import (
 
 // Start launch the server
 func Start() {
-
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/suggestMove", SuggestMove).
 		Methods("POST")
