@@ -8,6 +8,7 @@ import (
 type State struct {
 	Grid  [][]int
 	Piece int
+	Move [2]int
 }
 
 // GetNewState return a blanck state of defined size
@@ -37,6 +38,7 @@ func CopyState(state State) State {
 		}
 	}
 	newState.Piece = state.Piece
+	newState.Move = state.Move
 	return newState
 }
 
@@ -55,6 +57,7 @@ func PlacePieceOnGrid(state State) State {
 			for j := 0; j < size; j++ {
 				if newState.Grid[i][j] == 0 {
 					newState.Grid[i][j] = newState.Piece
+					newState.Move = [2]int{i,j}
 					newState.Piece = 0
 					return newState
 				}
@@ -97,4 +100,29 @@ func GetAllPiecesList(state State) []int {
 		piecesList = append(piecesList, i+1)
 	}
 	return piecesList
+}
+
+// IsValid return false if the state is not acceptable
+func IsValid(state State) bool {
+	size := GetGridSize(state)
+	if (len(state.Grid) != size) {
+		return false
+	}
+	if (state.Piece < 0 || state.Piece > (size * size)) {
+		return false
+	}
+	for i := 0; i < size; i++ {
+		if (len(state.Grid[i]) != size) {
+			return false
+		}
+		for j := 0; j < size; j++ {
+			if (state.Grid[i][j] < 0 || state.Grid[i][j] > (size * size)) {
+				return false
+			}
+			if (state.Piece > 0 && state.Grid[i][j] == state.Piece) {
+				return false
+			}
+		}
+	}
+	return true
 }
