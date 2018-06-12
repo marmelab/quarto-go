@@ -2,13 +2,14 @@ MAKEFLAGS += --silent
 
 .PHONY: help install run lint
 
-help: 
+help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 BIN = docker run \
 	-it \
 	--rm \
-	-v "${PWD}:/code" \
+	-v "${PWD}:/go" \
+	-p "8080:8080" \
 	--name quarto-go \
 	quarto-go
 
