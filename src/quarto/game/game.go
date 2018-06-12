@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/ahl5esoft/golang-underscore"
+	"quarto/grid"
 )
 
 var emptyCoord = [2]int{-1, -1}
@@ -13,15 +14,10 @@ type State struct {
 	Move [2]int
 }
 
-// GetNewState return a blanck state of defined size
+// GetNewState return a blank state of defined size
 func GetNewState(size int) State {
 	newState := State{}
-	for i := 0; i < size; i++ {
-		newState.Grid = append(newState.Grid, []int{})
-		for j := 0; j < size; j++ {
-			newState.Grid[i] = append(newState.Grid[i], 0)
-		}
-	}
+	newState.Grid = grid.GetNewGrid(size)
 	return newState
 }
 
@@ -32,13 +28,8 @@ func GetGridSize(state State) int {
 
 // CopyState create a new state copy of the parameter
 func CopyState(state State) State {
-	size := GetGridSize(state)
-	newState := GetNewState(size)
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			newState.Grid[i][j] = state.Grid[i][j]
-		}
-	}
+	newState := GetNewState(GetGridSize(state))
+	newState.Grid = grid.CopyGrid(state.Grid)
 	newState.Piece = state.Piece
 	newState.Move = state.Move
 	return newState
@@ -64,21 +55,21 @@ func PlacePieceOnGrid(state State) State {
 
 // ChoosePositionForPiece return coordinates to place the next piece
 func ChoosePositionForPiece(state State) [2]int{
-	coord := ChooseWinningtPositionForPiece(state)
+	coord := ChooseWinningPositionForPiece(state)
 	if (coord == emptyCoord) {
 		coord = ChooseFirstPositionForPiece(state)
 	}
 	return coord
 }
 
-// ChooseWinningtPositionForPiece return first winning coordinates to place the next piece if exists
-func ChooseWinningtPositionForPiece(state State) [2]int{
+// ChooseWinningPositionForPiece return first winning coordinates to place the next piece if exists
+func ChooseWinningPositionForPiece(state State) [2]int{
 	coord := emptyCoord
 	size := GetGridSize(state)
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if state.Grid[i][j] == 0 {
-				if (IsWinningPosition(j,i,state, size)) {
+				if (grid.IsWinningPosition(j,i,state.Grid, state.Piece)) {
 					coord[0] = i
 					coord[1] = j
 					return coord
@@ -88,70 +79,6 @@ func ChooseWinningtPositionForPiece(state State) [2]int{
 	}
 	return coord
 }
-
-// IsWinningPosition return true if the piece placed at these coordinates make a winning situation
-func IsWinningPosition(x int, y int, state State, size int) bool {
-	testState := CopyState(state)
-	testState.Grid[x][y] = testState.Piece
-	if (IsWinningLine(GetPiecesRaw(x,y,testState.Grid, size))) {
-		return true
-	}
-	if (IsWinningLine(GetPiecesColumn(x,y,testState.Grid, size))) {
-		return true
-	}
-	if (IsWinningLine(GetPiecesSlashDiag(x,y,testState.Grid, size))) {
-		return true
-	}
-	if (IsWinningLine(GetPiecesBackSlashDiag(x,y,testState.Grid, size))) {
-		return true
-	}
-	return false
-}
-
-// GetPiecesRaw return an array of the raw of pieces aligned in [x,y] coordinates
-func GetPiecesRaw(x int, y int, grid [][]int, size int) []int {
-	return grid[y]
-}
-
-// GetPiecesColumn return an array of the column of pieces aligned in [x,y] coordinates
-func GetPiecesColumn(x int, y int, grid [][]int, size int) []int {
-	piecesLine := []int{}
-	for i := 0; i < size; i++ {
-		piecesLine = append(piecesLine, grid[i][x])
-	}
-	return piecesLine
-}
-
-// GetPiecesSlashDiag return an array of the diag (slash oriented) of pieces aligned in [x,y] coordinates
-func GetPiecesSlashDiag(x int, y int, grid [][]int, size int) []int {
-	piecesLine := []int{}
-	if (x == y) {
-		for i := 0; i < size; i++ {
-			piecesLine = append(piecesLine, grid[i][i])
-		}
-	}
-	return piecesLine
-}
-
-// GetPiecesBackSlashDiag return an array of the diag (backslash oriented) of pieces aligned in [x,y] coordinates
-func GetPiecesBackSlashDiag(x int, y int, grid [][]int, size int) []int {
-	piecesLine := []int{}
-	if (x == size - y - 1) {
-		for i := 0; i < size; i++ {
-			piecesLine = append(piecesLine, grid[i][size - i - 1])
-		}
-	}
-	return piecesLine
-}
-
-// IsWinningLine return true if all piece in array makes a winning situation when aligned
-func IsWinningLine(piecesLine []int) bool {
-	if (len(piecesLine) == 0) {
-		return false
-	}
-	return false
-}
-
 
 // ChooseFirstPositionForPiece return first available coordinates to place the next piece
 func ChooseFirstPositionForPiece(state State) [2]int{
@@ -247,7 +174,7 @@ func IsValidGrid(state State, size int) bool {
 	return true
 }
 
-// IsValidPiece return false if the piace number is not acceptable
+// IsValidPiece return false if the piece number is not acceptable
 func IsValidPiece(piece int, size int) bool {
 	return piece >= 0 && piece <= (size * size)
 }
