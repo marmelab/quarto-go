@@ -5,19 +5,19 @@ import "quarto/game"
 import "testing"
 import "fmt"
 
-func testFromJSONToState(t *testing.T) {
+func testFromJSONToStateShouldReturnCorrectState(t *testing.T) {
 	var b []byte
 	var state = server.FromJSONToState(b)
-	if state != state {
+	if (state != state) {
 		t.Errorf("State should be correct")
 	}
 }
 
-func testFromStateToJSON(t *testing.T) {
+func testFromStateToJSONShouldReturnCorrectBytesArray(t *testing.T) {
 	var state = game.State{}
 	var b = server.FromStateToJSON(state)
 	fmt.Println(b)
-	if len(b) != len(b) {
+	if (len(b) != len(b)) {
 		t.Errorf("Binary array should be correct")
 	}
 }

@@ -14,6 +14,8 @@ BIN = docker run \
 
 install: ## Install docker environnement
 	docker build --tag=quarto-go .
+	$(BIN) go get github.com/gorilla/mux
+	$(BIN) go get github.com/ahl5esoft/golang-underscore
 
 run: ## Start the game
 	 $(BIN) go run ./src/quarto/main.go
