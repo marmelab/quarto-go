@@ -66,6 +66,34 @@ func TestPlacePieceOnGridShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
 	}
 }
 
+func TestChoosePositionForPieceShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
+	var state = game.GetNewState(4)
+	state.Piece = 3
+	coord := game.ChoosePositionForPiece(state)
+	if (coord[0] != 0 || coord[1] != 0) {
+		t.Errorf("Piece 3 should be placed in init of the Grid")
+	}
+}
+
+func TestChooseFirstPositionForPieceShouldReturnZeroZeroCoordinatesWhenCalledFirst(t *testing.T) {
+	var state = game.GetNewState(4)
+	state.Piece = 3
+	coord := game.ChooseFirstPositionForPiece(state)
+	if (coord[0] != 0 || coord[1] != 0) {
+		t.Errorf("Piece 3 should be placed in init of the Grid")
+	}
+}
+
+func TestChooseFirstPositionForPieceShouldReturnOneZeroCoordinatesWhenCalledSecond(t *testing.T) {
+	var state = game.GetNewState(4)
+	state.Grid[0][0] = 7
+	state.Piece = 3
+	coord := game.ChooseFirstPositionForPiece(state)
+	if (coord[0] != 0 || coord[1] != 1) {
+		t.Errorf("Piece 3 should be placed in second of the Grid")
+	}
+}
+
 func TestChooseNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Grid[0][0] = 1

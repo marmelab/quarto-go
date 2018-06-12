@@ -4,6 +4,8 @@ import (
 	"github.com/ahl5esoft/golang-underscore"
 )
 
+var emptyCoord = [2]int{-1, -1}
+
 // State define data for a game state
 type State struct {
 	Grid  [][]int
@@ -51,20 +53,54 @@ func PlayTurn(state State) State {
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
 func PlacePieceOnGrid(state State) State {
 	newState := CopyState(state)
-	size := GetGridSize(newState)
 	if newState.Piece > 0 {
-		for i := 0; i < size; i++ {
-			for j := 0; j < size; j++ {
-				if newState.Grid[i][j] == 0 {
-					newState.Grid[i][j] = newState.Piece
-					newState.Move = [2]int{i,j}
-					newState.Piece = 0
-					return newState
-				}
+		coord := ChoosePositionForPiece(state)
+		newState.Grid[coord[0]][coord[1]] = newState.Piece
+		newState.Move = coord
+		newState.Piece = 0
+	}
+	return newState
+}
+
+// ChoosePositionForPiece return coordinates to place the next piece
+func ChoosePositionForPiece(state State) [2]int{
+	coord := ChooseWinningtPositionForPiece(state)
+	if (coord == emptyCoord) {
+		coord = ChooseFirstPositionForPiece(state)
+	}
+	return coord
+}
+
+// ChooseWinningtPositionForPiece return first winning coordinates to place the next piece if exists
+func ChooseWinningtPositionForPiece(state State) [2]int{
+	coord := emptyCoord
+	size := GetGridSize(state)
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			if state.Grid[i][j] == 0 {
+				coord[0] = i
+				coord[1] = j
+				return coord
 			}
 		}
 	}
-	return newState
+	return coord
+}
+
+// ChooseFirstPositionForPiece return first available coordinates to place the next piece
+func ChooseFirstPositionForPiece(state State) [2]int{
+	coord := emptyCoord
+	size := GetGridSize(state)
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			if state.Grid[i][j] == 0 {
+				coord[0] = i
+				coord[1] = j
+				return coord
+			}
+		}
+	}
+	return coord
 }
 
 // ChooseNewPiece select a new piece for opponent
@@ -105,11 +141,22 @@ func GetAllPiecesList(state State) []int {
 // IsValid return false if the state is not acceptable
 func IsValid(state State) bool {
 	size := GetGridSize(state)
-	var piecesList = GetAllPiecesList(state)
-	if (len(state.Grid) != size) {
+	if (!IsValidPiece(state.Piece,size)) {
 		return false
 	}
-	if (!IsValidPiece(state.Piece,size)) {
+	if (!IsValidGrid(state, size)) {
+		return false
+	}
+	if (!IsValidMove(state.Move, size)) {
+		return false
+	}
+	return true
+}
+
+// IsValidGrid return false if the piace number is not acceptable
+func IsValidGrid(state State, size int) bool {
+	var piecesList = GetAllPiecesList(state)
+	if (len(state.Grid) != size) {
 		return false
 	}
 	for i := 0; i < size; i++ {
@@ -130,10 +177,6 @@ func IsValid(state State) bool {
 				piecesList = append(piecesList[:pieceIndex], piecesList[pieceIndex+1:]...)
 			}
 		}
-	}
-	
-	if (!IsValidMove(state.Move, size)) {
-		return false
 	}
 	return true
 }
