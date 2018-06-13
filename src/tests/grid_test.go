@@ -255,6 +255,6 @@ func TestGetSafestBoxesShouldReturnListOfThreePoints(t *testing.T) {
 	referencesPointList := []grid.Point{grid.Point{3, 0, 5}, grid.Point{4, 3, 5}, grid.Point{3, 4, 5}}
 	if !reflect.DeepEqual(pointList, referencesPointList) {
 		fmt.Println(pointList)
-		t.Errorf("Safest boxes should be [] and []")
+		t.Errorf("Safest boxes should be [3, 0] and [4, 3] and [3, 4]")
 	}
 }
