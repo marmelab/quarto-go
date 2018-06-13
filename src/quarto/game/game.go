@@ -57,6 +57,9 @@ func PlacePieceOnGrid(state State) State {
 func ChoosePositionForPiece(state State) *grid.Point {
 	coord := ChooseWinningPositionForPiece(state)
 	if coord == nil {
+		coord = ChooseDefensivePositionForPiece(state)
+	}
+	if coord == nil {
 		coord = ChooseRandomPositionForPiece(state)
 	}
 	return coord
@@ -71,6 +74,16 @@ func ChooseWinningPositionForPiece(state State) *grid.Point {
 		}
 	}
 	return nil
+}
+
+// ChooseDefensivePositionForPiece return available coordinates to place the next piece where grid is the less filled
+func ChooseDefensivePositionForPiece(state State) *grid.Point {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	pointList := grid.GetSafestBoxes(state.Grid)
+	if len(pointList) == 0 {
+		return nil
+	}
+	return &pointList[r.Intn(len(pointList))]
 }
 
 // ChooseRandomPositionForPiece return random available coordinates to place the next piece
