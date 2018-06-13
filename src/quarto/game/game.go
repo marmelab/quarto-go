@@ -83,12 +83,12 @@ func ChooseRandomPositionForPiece(state State) *grid.Point {
 // DefineNewPiece select a new piece for opponent
 func DefineNewPiece(state State) State {
 	newState := CopyState(state)
-	newState.Piece = ChooseNewPiece(newState)
+	newState.Piece = ChooseRandomPiece(newState)
 	return newState
 }
 
-// ChooseNewPiece choose a new piece for  for next opponent turn
-func ChooseNewPiece(state State) int {
+// ChooseRandomPiece choose a new piece for  for next opponent turn
+func ChooseRandomPiece(state State) int {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	piecesList := GetRemainingPiecesListFromState(state)
 	return piecesList[r.Intn(len(piecesList))]
