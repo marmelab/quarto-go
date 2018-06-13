@@ -126,10 +126,10 @@ func TestDefineNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
 	}
 }
 
-func TestChooseNewPieceShouldReturnAnAvailablePiece(t *testing.T) {
+func TestChooseRandomPieceShouldReturnAnAvailablePiece(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Grid[0][0] = 1
-	piece := game.ChooseNewPiece(state)
+	piece := game.ChooseRandomPiece(state)
 	if piece == 0 {
 		t.Errorf("piece should'nt be empty after choosed")
 	}
@@ -138,13 +138,13 @@ func TestChooseNewPieceShouldReturnAnAvailablePiece(t *testing.T) {
 	}
 }
 
-func TestChooseNewPieceShouldSelectAnAvailablePiece(t *testing.T) {
+func TestChooseRandomPieceShouldSelectAnAvailablePiece(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Grid[0] = []int{1, 2, 3, 4}
 	state.Grid[1] = []int{9, 10, 11, 0}
 	state.Grid[2] = []int{8, 7, 6, 5}
 	state.Grid[3] = []int{16, 15, 14, 13}
-	piece := game.ChooseNewPiece(state)
+	piece := game.ChooseRandomPiece(state)
 	if piece != 12 {
 		t.Errorf("piece should'nt be 12, the only remaining piece")
 	}
