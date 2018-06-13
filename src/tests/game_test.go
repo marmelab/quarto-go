@@ -74,7 +74,7 @@ func TestChoosePositionForPieceShouldPlaceOnFreeCoordinatesWhenCalledFirst(t *te
 	var state = game.GetNewState(4)
 	state.Piece = 9
 	coord := game.ChoosePositionForPiece(state)
-	if coord.X == -1 || coord.Y == -1 {
+	if coord == nil {
 		t.Errorf("Piece 9 coordinates should be in the Grid")
 	}
 }
@@ -83,7 +83,7 @@ func TestChooseRandomPositionForPieceShouldReturnAnyCoordinatesInTheGridWhenCall
 	var state = game.GetNewState(4)
 	state.Piece = 3
 	coord := game.ChooseRandomPositionForPiece(state)
-	if coord.X == -1 || coord.Y == -1 {
+	if coord == nil {
 		t.Errorf("Piece 3 coordinates should be in the Grid")
 	}
 }
@@ -93,7 +93,7 @@ func TestChooseRandomPositionForPieceShouldReturnFreeCoordinatesInTheGrid(t *tes
 	state.Grid[0][0] = 7
 	state.Piece = 5
 	coord := game.ChooseRandomPositionForPiece(state)
-	if coord.X == -1 || coord.Y == -1 {
+	if coord == nil {
 		t.Errorf("Piece 5 coordinates should be in the Grid")
 	}
 	if coord.X == 0 && coord.Y == 0 {
@@ -138,7 +138,7 @@ func TestChooseRandomPieceShouldReturnAnAvailablePiece(t *testing.T) {
 	}
 }
 
-func TestChooseRandomPieceShouldSelectAnAvailablePiece(t *testing.T) {
+func TestChooseRandomPieceShouldReturnTheOnlyAvailablePiece(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Grid[0] = []int{1, 2, 3, 4}
 	state.Grid[1] = []int{9, 10, 11, 0}
@@ -146,22 +146,59 @@ func TestChooseRandomPieceShouldSelectAnAvailablePiece(t *testing.T) {
 	state.Grid[3] = []int{16, 15, 14, 13}
 	piece := game.ChooseRandomPiece(state)
 	if piece != 12 {
-		t.Errorf("piece should'nt be 12, the only remaining piece")
+		t.Errorf("piece should be 12, the only remaining piece")
 	}
 }
 
-func TestInitListOfRemainingPiecesShouldReturnAGridSizedZeroFilledListWhenCalledFirst(t *testing.T) {
-	var list = game.GetRemainingPiecesListFromState(game.State{})
+func TestChooseNonWinningPieceShouldNotReturnWinningPiece(t *testing.T) {
+	var state = game.GetNewState(4)
+	state.Grid[0] = []int{1, 2, 3, 4}
+	state.Grid[1] = []int{9, 10, 11, 0}
+	state.Grid[2] = []int{8, 7, 6, 5}
+	state.Grid[3] = []int{16, 15, 14, 13}
+	piece := game.ChooseNonWinningPiece(state)
+	if piece != 12 {
+		t.Errorf("piece should be 12, the only remaining piece")
+	}
+}
+
+func TestGetNonWinningPiecesShouldReturnFullListWhenGameIsEmptyn(t *testing.T) {
+	var state = game.GetNewState(4)
+	var list = game.GetNonWinningPiecesListFromState(state)
 	var referenceList []int
 	for i := 0; i < 16; i++ {
-		referenceList = append(referenceList, 0)
+		referenceList = append(referenceList, i+1)
 	}
-	if reflect.DeepEqual(list, referenceList) {
-		t.Errorf("Pieces list should have 16 elements of 0 at the beginning")
+	if !reflect.DeepEqual(list, referenceList) {
+		t.Errorf("Non winning pieces list should have elements from 1 to 16 at the beginning")
 	}
 }
 
-func TestInitListOfAllPiecesShouldReturnAGridSizedZeroFilledList(t *testing.T) {
+func TestGetNonWinningPiecesShouldReturnAEmptyListWhenGameIsWonNextTurn(t *testing.T) {
+	var state = game.GetNewState(4)
+	state.Grid[0] = []int{1, 2, 3, 4}
+	state.Grid[1] = []int{9, 10, 11, 0}
+	state.Grid[2] = []int{8, 7, 6, 5}
+	state.Grid[3] = []int{16, 15, 14, 13}
+	var list = game.GetNonWinningPiecesListFromState(state)
+	var referenceList = []int{}
+	if reflect.DeepEqual(list, referenceList) {
+		t.Errorf("Pieces list should have 0 elements when the game is lost next turn")
+	}
+}
+
+func TestGetRemainingPiecesShouldReturnAGridSizedZeroFilledListWhenCalledFirst(t *testing.T) {
+	var list = game.GetRemainingPiecesListFromState(game.GetNewState(4))
+	var referenceList []int
+	for i := 0; i < 16; i++ {
+		referenceList = append(referenceList, i+1)
+	}
+	if !reflect.DeepEqual(list, referenceList) {
+		t.Errorf("Pieces list should have elements from 1 to 16 at the beginning")
+	}
+}
+
+func TestGetAllPiecesShouldReturnAGridSizedZeroFilledList(t *testing.T) {
 	var list = game.GetAllPiecesList(game.GetNewState(4))
 	var referenceList []int
 	for i := 0; i < 16; i++ {

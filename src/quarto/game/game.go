@@ -77,21 +77,54 @@ func ChooseWinningPositionForPiece(state State) *grid.Point {
 func ChooseRandomPositionForPiece(state State) *grid.Point {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	pointList := grid.GetEmptyBoxes(state.Grid)
+	if len(pointList) == 0 {
+		return nil
+	}
 	return &pointList[r.Intn(len(pointList))]
 }
 
 // DefineNewPiece select a new piece for opponent
 func DefineNewPiece(state State) State {
 	newState := CopyState(state)
-	newState.Piece = ChooseRandomPiece(newState)
+	newState.Piece = ChooseNonWinningPiece(newState)
+	if newState.Piece == 0 {
+		newState.Piece = ChooseRandomPiece(state)
+	}
 	return newState
 }
 
-// ChooseRandomPiece choose a new piece for  for next opponent turn
+// ChooseRandomPiece choose a random piece for next opponent turn
 func ChooseRandomPiece(state State) int {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	piecesList := GetRemainingPiecesListFromState(state)
+	if len(piecesList) == 0 {
+		return 0
+	}
 	return piecesList[r.Intn(len(piecesList))]
+}
+
+// ChooseNonWinningPiece choose a non winning piece for next opponent turn
+func ChooseNonWinningPiece(state State) int {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	piecesList := GetNonWinningPiecesListFromState(state)
+	if len(piecesList) == 0 {
+		return 0
+	}
+	return piecesList[r.Intn(len(piecesList))]
+}
+
+// GetNonWinningPiecesListFromState generate a list of pieces to play wich can't win on next turn
+func GetNonWinningPiecesListFromState(state State) []int {
+	var piecesList = GetRemainingPiecesListFromState(state)
+	pointList := grid.GetEmptyBoxes(state.Grid)
+	for i := 0; i < len(piecesList); i++ {
+		for j := 0; j < len(pointList); j++ {
+			if grid.IsWinningPosition(pointList[j].X, pointList[j].Y, state.Grid, piecesList[i]) {
+				piecesList = append(piecesList[:i], piecesList[i+1:]...)
+			}
+		}
+	}
+	return piecesList
 }
 
 // GetRemainingPiecesListFromState generate a list of pieces not already in the grid
