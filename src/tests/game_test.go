@@ -74,7 +74,7 @@ func TestChoosePositionForPieceShouldPlaceOnFreeCoordinatesWhenCalledFirst(t *te
 	var state = game.GetNewState(4)
 	state.Piece = 9
 	coord := game.ChoosePositionForPiece(state)
-	if coord[0] == -1 || coord[1] == -1 {
+	if coord.X == -1 || coord.Y == -1 {
 		t.Errorf("Piece 9 coordinates should be in the Grid")
 	}
 }
@@ -83,7 +83,7 @@ func TestChooseRandomPositionForPieceShouldReturnAnyCoordinatesInTheGridWhenCall
 	var state = game.GetNewState(4)
 	state.Piece = 3
 	coord := game.ChooseRandomPositionForPiece(state)
-	if coord[0] == -1 || coord[1] == -1 {
+	if coord.X == -1 || coord.Y == -1 {
 		t.Errorf("Piece 3 coordinates should be in the Grid")
 	}
 }
@@ -93,10 +93,10 @@ func TestChooseRandomPositionForPieceShouldReturnFreeCoordinatesInTheGrid(t *tes
 	state.Grid[0][0] = 7
 	state.Piece = 5
 	coord := game.ChooseRandomPositionForPiece(state)
-	if coord[0] == -1 || coord[1] == -1 {
+	if coord.X == -1 || coord.Y == -1 {
 		t.Errorf("Piece 5 coordinates should be in the Grid")
 	}
-	if coord[0] == 0 && coord[1] == 0 {
+	if coord.X == 0 && coord.Y == 0 {
 		t.Errorf("Piece 5 coordinates should be in a free coordinates in the Grid")
 	}
 }
@@ -109,7 +109,7 @@ func TestChooseRandomPositionForPieceShouldReturnTheOnlyFreeCoordinatesInTheGrid
 	state.Grid[3] = []int{16, 15, 14, 13}
 	state.Piece = 12
 	coord := game.ChooseRandomPositionForPiece(state)
-	if coord[0] != 1 || coord[1] != 3 {
+	if coord.Y != 1 || coord.X != 3 {
 		t.Errorf("Piece 12 coordinates should be in the only free coordinates in the Grid")
 	}
 }
@@ -197,13 +197,13 @@ func TestIsValidPieceShouldReturnTrueWhenPieceNumberIsZero(t *testing.T) {
 }
 
 func TestIsValidMoveShouldReturnTrueWhenMoveCoordinatesAreInGridSize(t *testing.T) {
-	if !game.IsValidMove([2]int{2, 3}, 4) {
+	if !game.IsValidMove([2]int{3, 2}, 4) {
 		t.Errorf("Move should be valid ([2,3] is a good coordinate in 4*4 grid)")
 	}
 }
 
 func TestIsValidMoveShouldReturnFalseWhenMoveCoordinatesAreNotInGridSize(t *testing.T) {
-	if game.IsValidMove([2]int{2, 3}, 3) {
+	if game.IsValidMove([2]int{3, 2}, 3) {
 		t.Errorf("Move shouldn't be valid ([2,3] is a bad coordinate in 3*3 grid)")
 	}
 }

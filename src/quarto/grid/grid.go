@@ -5,7 +5,11 @@ import (
 	"math"
 )
 
-var emptyCoord = [2]int{-1, -1}
+// Coord define data for a grid coordinate
+type Coord struct {
+	X  int
+	Y  int
+}
 
 // GetNewGrid return a blank grid of defined size
 func GetNewGrid(size int) [][]int {
@@ -109,13 +113,13 @@ func IsWinningLine(piecesLine []int) bool {
 }
 
 // GetEmptyBoxes return list of empty boxes in the grid
-func GetEmptyBoxes(grid [][]int) [][2]int {
-	coordList := [][2]int{}
+func GetEmptyBoxes(grid [][]int) []Coord {
+	coordList := []Coord{}
 	size := len(grid)
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if grid[i][j] == 0 {
-				coordList = append(coordList, [2]int{i, j})
+				coordList = append(coordList, Coord{j, i})
 			}
 		}
 	}

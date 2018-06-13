@@ -3,10 +3,9 @@ package game
 import (
 	"github.com/ahl5esoft/golang-underscore"
 	"math/rand"
+	"time"
 	"quarto/grid"
 )
-
-var emptyCoord = [2]int{-1, -1}
 
 // State define data for a game state
 type State struct {
@@ -47,39 +46,38 @@ func PlacePieceOnGrid(state State) State {
 	newState := CopyState(state)
 	if newState.Piece > 0 {
 		coord := ChoosePositionForPiece(state)
-		newState.Grid[coord[0]][coord[1]] = newState.Piece
-		newState.Move = coord
+		newState.Grid[coord.Y][coord.X] = newState.Piece
+		newState.Move = [2]int{coord.Y, coord.X}
 		newState.Piece = 0
 	}
 	return newState
 }
 
 // ChoosePositionForPiece return coordinates to place the next piece
-func ChoosePositionForPiece(state State) [2]int {
+func ChoosePositionForPiece(state State) *grid.Coord {
 	coord := ChooseWinningPositionForPiece(state)
-	if coord == emptyCoord {
+	if (coord == nil) {
 		coord = ChooseRandomPositionForPiece(state)
 	}
 	return coord
 }
 
 // ChooseWinningPositionForPiece return first winning coordinates to place the next piece if exists
-func ChooseWinningPositionForPiece(state State) [2]int {
+func ChooseWinningPositionForPiece(state State) *grid.Coord {
 	coordList := grid.GetEmptyBoxes(state.Grid)
 	for i := 0; i < len(coordList); i++ {
-		if grid.IsWinningPosition(coordList[i][0], coordList[i][1], state.Grid, state.Piece) {
-			return coordList[i]
-
+		if grid.IsWinningPosition(coordList[i].X, coordList[i].Y, state.Grid, state.Piece) {
+			return &coordList[i]
 		}
 	}
-	return emptyCoord
+	return nil
 }
 
 // ChooseRandomPositionForPiece return random available coordinates to place the next piece
-func ChooseRandomPositionForPiece(state State) [2]int {
-	r := rand.New(rand.NewSource(99))
+func ChooseRandomPositionForPiece(state State) *grid.Coord {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	coordList := grid.GetEmptyBoxes(state.Grid)
-	return coordList[r.Intn(len(coordList))]
+	return &coordList[r.Intn(len(coordList))]
 }
 
 // ChooseNewPiece select a new piece for opponent
