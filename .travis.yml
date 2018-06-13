@@ -1,14 +1,16 @@
 # https://travis-ci.com/marmelab/quarto-go
 
+sudo: required
 language: go
+
+services:
+    - docker
 
 go: "1.8"
 
-install:
-  - GOPATH=$(pwd) && go get github.com/gorilla/mux
-  - GOPATH=$(pwd) && go get github.com/ahl5esoft/golang-underscore
+install: make install
 
-script: GOPATH=$(pwd) && make test-local
+script: make test
 
 branches:
   only:

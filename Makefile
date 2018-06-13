@@ -1,14 +1,20 @@
 MAKEFLAGS += --silent
 
+UID = $(shell id -u)
+GID = $(shell id -g)
+
 .PHONY: help install run lint
 
-help: 
+help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 BIN = docker run \
 	-it \
 	--rm \
-	-v "${PWD}:/code" \
+	--user "${UID}:${GID}" \
+	-v "${PWD}:/go" \
+	-v "/etc/passwd:/etc/passwd:ro" \
+	-p "8080:8080" \
 	--name quarto-go \
 	quarto-go
 
@@ -22,9 +28,6 @@ run: ## Start the game
 
 test: ## Test the code
 	$(BIN) go test -v ./src/tests
-
-test-local:
-	cd ./src/tests/ && go test -run ''
 
 lint: ## Check the code syntax and rules
 	$(BIN) gofmt -w ./src
