@@ -33,10 +33,10 @@ func TestCopyStateShouldReturnANewStateNotEqualToSourceAfterChanges(t *testing.T
 func TestGetNewStateShouldReturnAnEmptyState(t *testing.T) {
 	var state = game.GetNewState(4)
 	var referenceState = game.GetNewState(4)
-	referenceState.Grid[0] = []int{0,0,0,0}
-	referenceState.Grid[1] = []int{0,0,0,0}
-	referenceState.Grid[2] = []int{0,0,0,0}
-	referenceState.Grid[3] = []int{0,0,0,0}
+	referenceState.Grid[0] = []int{0, 0, 0, 0}
+	referenceState.Grid[1] = []int{0, 0, 0, 0}
+	referenceState.Grid[2] = []int{0, 0, 0, 0}
+	referenceState.Grid[3] = []int{0, 0, 0, 0}
 	referenceState.Piece = 0
 	if !reflect.DeepEqual(state, referenceState) {
 		t.Errorf("State should be empty at first move")
@@ -54,43 +54,63 @@ func TestPlayTurnShouldReturnAnEmptyGridWithSelectedPieceWhenCalledFirst(t *test
 	}
 }
 
-func TestPlacePieceOnGridShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
+func TestPlacePieceOnGridShouldPlaceOnFreeCaseWhenCalledLast(t *testing.T) {
 	var state = game.GetNewState(4)
-	state.Piece = 3
+	state.Grid[0] = []int{1, 2, 3, 4}
+	state.Grid[1] = []int{9, 10, 11, 0}
+	state.Grid[2] = []int{8, 7, 6, 5}
+	state.Grid[3] = []int{16, 15, 14, 13}
+	state.Piece = 12
 	state = game.PlacePieceOnGrid(state)
-	if state.Grid[0][0] != 3 {
-		t.Errorf("Piece 3 should be placed in init of the Grid")
+	if state.Grid[1][3] != 12 {
+		t.Errorf("Piece 12 should be placed in the empty place of the Grid")
 	}
 	if state.Piece != 0 {
 		t.Errorf("Piece should be empty after placed")
 	}
 }
 
-func TestChoosePositionForPieceShouldPlaceOnFirstCaseWhenCalledFirst(t *testing.T) {
+func TestChoosePositionForPieceShouldPlaceOnFreeCoordinatesWhenCalledFirst(t *testing.T) {
 	var state = game.GetNewState(4)
-	state.Piece = 3
+	state.Piece = 9
 	coord := game.ChoosePositionForPiece(state)
-	if (coord[0] != 0 || coord[1] != 0) {
-		t.Errorf("Piece 3 should be placed in init of the Grid")
+	if coord[0] == -1 || coord[1] == -1 {
+		t.Errorf("Piece 9 coordinates should be in the Grid")
 	}
 }
 
-func TestChooseFirstPositionForPieceShouldReturnZeroZeroCoordinatesWhenCalledFirst(t *testing.T) {
+func TestChooseRandomPositionForPieceShouldReturnAnyCoordinatesInTheGridWhenCalledFirst(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Piece = 3
-	coord := game.ChooseFirstPositionForPiece(state)
-	if (coord[0] != 0 || coord[1] != 0) {
-		t.Errorf("Piece 3 should be placed in init of the Grid")
+	coord := game.ChooseRandomPositionForPiece(state)
+	if coord[0] == -1 || coord[1] == -1 {
+		t.Errorf("Piece 3 coordinates should be in the Grid")
 	}
 }
 
-func TestChooseFirstPositionForPieceShouldReturnOneZeroCoordinatesWhenCalledSecond(t *testing.T) {
+func TestChooseRandomPositionForPieceShouldReturnFreeCoordinatesInTheGrid(t *testing.T) {
 	var state = game.GetNewState(4)
 	state.Grid[0][0] = 7
-	state.Piece = 3
-	coord := game.ChooseFirstPositionForPiece(state)
-	if (coord[0] != 0 || coord[1] != 1) {
-		t.Errorf("Piece 3 should be placed in second of the Grid")
+	state.Piece = 5
+	coord := game.ChooseRandomPositionForPiece(state)
+	if coord[0] == -1 || coord[1] == -1 {
+		t.Errorf("Piece 5 coordinates should be in the Grid")
+	}
+	if coord[0] == 0 && coord[1] == 0 {
+		t.Errorf("Piece 5 coordinates should be in a free coordinates in the Grid")
+	}
+}
+
+func TestChooseRandomPositionForPieceShouldReturnTheOnlyFreeCoordinatesInTheGrid(t *testing.T) {
+	var state = game.GetNewState(4)
+	state.Grid[0] = []int{1, 2, 3, 4}
+	state.Grid[1] = []int{9, 10, 11, 0}
+	state.Grid[2] = []int{8, 7, 6, 5}
+	state.Grid[3] = []int{16, 15, 14, 13}
+	state.Piece = 12
+	coord := game.ChooseRandomPositionForPiece(state)
+	if coord[0] != 1 || coord[1] != 3 {
+		t.Errorf("Piece 12 coordinates should be in the only free coordinates in the Grid")
 	}
 }
 
@@ -137,7 +157,7 @@ func TestIsValidShouldReturnTrueWithGoodState(t *testing.T) {
 
 func TestIsValidShouldReturnFalseWithBadState(t *testing.T) {
 	var state = game.GetNewState(6)
-	state.Grid = append(state.Grid, []int{0,0,0,0})
+	state.Grid = append(state.Grid, []int{0, 0, 0, 0})
 	if game.IsValid(state) {
 		t.Errorf("State shouldn't be valid")
 	}
@@ -177,13 +197,13 @@ func TestIsValidPieceShouldReturnTrueWhenPieceNumberIsZero(t *testing.T) {
 }
 
 func TestIsValidMoveShouldReturnTrueWhenMoveCoordinatesAreInGridSize(t *testing.T) {
-	if !game.IsValidMove([2]int{2,3}, 4) {
+	if !game.IsValidMove([2]int{2, 3}, 4) {
 		t.Errorf("Move should be valid ([2,3] is a good coordinate in 4*4 grid)")
 	}
 }
 
 func TestIsValidMoveShouldReturnFalseWhenMoveCoordinatesAreNotInGridSize(t *testing.T) {
-	if game.IsValidMove([2]int{2,3}, 3) {
+	if game.IsValidMove([2]int{2, 3}, 3) {
 		t.Errorf("Move shouldn't be valid ([2,3] is a bad coordinate in 3*3 grid)")
 	}
 }

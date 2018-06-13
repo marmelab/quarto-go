@@ -1,5 +1,10 @@
 package grid
 
+import (
+	"github.com/ahl5esoft/golang-underscore"
+	"math"
+)
+
 var emptyCoord = [2]int{-1, -1}
 
 // GetNewGrid return a blank grid of defined size
@@ -29,16 +34,16 @@ func CopyGrid(grid [][]int) [][]int {
 func IsWinningPosition(x int, y int, grid [][]int, piece int) bool {
 	testGrid := CopyGrid(grid)
 	testGrid[x][y] = piece
-	if (IsWinningLine(GetPiecesRaw(x,y,testGrid))) {
+	if IsWinningLine(GetPiecesRaw(x, y, testGrid)) {
 		return true
 	}
-	if (IsWinningLine(GetPiecesColumn(x,y,testGrid))) {
+	if IsWinningLine(GetPiecesColumn(x, y, testGrid)) {
 		return true
 	}
-	if (IsWinningLine(GetPiecesSlashDiag(x,y,testGrid))) {
+	if IsWinningLine(GetPiecesSlashDiag(x, y, testGrid)) {
 		return true
 	}
-	if (IsWinningLine(GetPiecesBackSlashDiag(x,y,testGrid))) {
+	if IsWinningLine(GetPiecesBackSlashDiag(x, y, testGrid)) {
 		return true
 	}
 	return false
@@ -61,7 +66,7 @@ func GetPiecesColumn(x int, y int, grid [][]int) []int {
 // GetPiecesSlashDiag return an array of the diag (slash oriented) of pieces aligned in [x,y] coordinates
 func GetPiecesSlashDiag(x int, y int, grid [][]int) []int {
 	piecesLine := []int{}
-	if (x == y) {
+	if x == y {
 		for i := 0; i < len(grid); i++ {
 			piecesLine = append(piecesLine, grid[i][i])
 		}
@@ -72,9 +77,9 @@ func GetPiecesSlashDiag(x int, y int, grid [][]int) []int {
 // GetPiecesBackSlashDiag return an array of the diag (backslash oriented) of pieces aligned in [x,y] coordinates
 func GetPiecesBackSlashDiag(x int, y int, grid [][]int) []int {
 	piecesLine := []int{}
-	if (x == len(grid) - y - 1) {
+	if x == len(grid)-y-1 {
 		for i := 0; i < len(grid); i++ {
-			piecesLine = append(piecesLine, grid[i][len(grid) - i - 1])
+			piecesLine = append(piecesLine, grid[i][len(grid)-i-1])
 		}
 	}
 	return piecesLine
@@ -82,8 +87,37 @@ func GetPiecesBackSlashDiag(x int, y int, grid [][]int) []int {
 
 // IsWinningLine return true if all piece in array makes a winning situation when aligned
 func IsWinningLine(piecesLine []int) bool {
-	if (len(piecesLine) == 0) {
+	if len(piecesLine) == 0 {
 		return false
 	}
-	return false
+	var indexEmptyPiece = underscore.FindIndex(piecesLine, func(n, _ int) bool {
+		return n == 0
+	})
+	if indexEmptyPiece >= 0 {
+		return false
+	}
+
+	bitInverser := int(math.Pow(2, float64(len(piecesLine))) - 1)
+	propertiesAtTrue := underscore.Reduce(piecesLine, func(prev int, curr, _ int) int {
+		return prev & (curr - 1)
+	}, 1)
+
+	propertiesAtFalse := underscore.Reduce(piecesLine, func(prev int, curr, _ int) int {
+		return prev & ((curr - 1) ^ bitInverser)
+	}, 1)
+	return propertiesAtTrue != 0 || propertiesAtFalse != 0
+}
+
+// GetEmptyBoxes return list of empty boxes in the grid
+func GetEmptyBoxes(grid [][]int) [][2]int {
+	coordList := [][2]int{}
+	size := len(grid)
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			if grid[i][j] == 0 {
+				coordList = append(coordList, [2]int{i, j})
+			}
+		}
+	}
+	return coordList
 }

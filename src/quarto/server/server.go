@@ -56,7 +56,7 @@ func SuggestMove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	state, err := serializer.FromJSONToState(b)
-	if (!game.IsValid(state)) {
+	if !game.IsValid(state) {
 		http.Error(w, "Error invalid state in request", 500)
 		return
 	}
