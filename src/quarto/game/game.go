@@ -3,8 +3,8 @@ package game
 import (
 	"github.com/ahl5esoft/golang-underscore"
 	"math/rand"
-	"time"
 	"quarto/grid"
+	"time"
 )
 
 // State define data for a game state
@@ -38,7 +38,7 @@ func CopyState(state State) State {
 // PlayTurn return the next move for given grid
 func PlayTurn(state State) State {
 	newState := PlacePieceOnGrid(state)
-	return ChooseNewPiece(newState)
+	return DefineNewPiece(newState)
 }
 
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
@@ -54,37 +54,44 @@ func PlacePieceOnGrid(state State) State {
 }
 
 // ChoosePositionForPiece return coordinates to place the next piece
-func ChoosePositionForPiece(state State) *grid.Coord {
+func ChoosePositionForPiece(state State) *grid.Point {
 	coord := ChooseWinningPositionForPiece(state)
-	if (coord == nil) {
+	if coord == nil {
 		coord = ChooseRandomPositionForPiece(state)
 	}
 	return coord
 }
 
 // ChooseWinningPositionForPiece return first winning coordinates to place the next piece if exists
-func ChooseWinningPositionForPiece(state State) *grid.Coord {
-	coordList := grid.GetEmptyBoxes(state.Grid)
-	for i := 0; i < len(coordList); i++ {
-		if grid.IsWinningPosition(coordList[i].X, coordList[i].Y, state.Grid, state.Piece) {
-			return &coordList[i]
+func ChooseWinningPositionForPiece(state State) *grid.Point {
+	pointList := grid.GetEmptyBoxes(state.Grid)
+	for i := 0; i < len(pointList); i++ {
+		if grid.IsWinningPosition(pointList[i].X, pointList[i].Y, state.Grid, state.Piece) {
+			return &pointList[i]
 		}
 	}
 	return nil
 }
 
 // ChooseRandomPositionForPiece return random available coordinates to place the next piece
-func ChooseRandomPositionForPiece(state State) *grid.Coord {
+func ChooseRandomPositionForPiece(state State) *grid.Point {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	coordList := grid.GetEmptyBoxes(state.Grid)
-	return &coordList[r.Intn(len(coordList))]
+	pointList := grid.GetEmptyBoxes(state.Grid)
+	return &pointList[r.Intn(len(pointList))]
 }
 
-// ChooseNewPiece select a new piece for opponent
-func ChooseNewPiece(state State) State {
+// DefineNewPiece select a new piece for opponent
+func DefineNewPiece(state State) State {
 	newState := CopyState(state)
-	newState.Piece = GetRemainingPiecesListFromState(newState)[0]
+	newState.Piece = ChooseNewPiece(newState)
 	return newState
+}
+
+// ChooseNewPiece choose a new piece for  for next opponent turn
+func ChooseNewPiece(state State) int {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	piecesList := GetRemainingPiecesListFromState(state)
+	return piecesList[r.Intn(len(piecesList))]
 }
 
 // GetRemainingPiecesListFromState generate a list of pieces not already in the grid

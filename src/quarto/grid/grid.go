@@ -6,9 +6,9 @@ import (
 )
 
 // Coord define data for a grid coordinate
-type Coord struct {
-	X  int
-	Y  int
+type Point struct {
+	X int
+	Y int
 }
 
 // GetNewGrid return a blank grid of defined size
@@ -113,15 +113,15 @@ func IsWinningLine(piecesLine []int) bool {
 }
 
 // GetEmptyBoxes return list of empty boxes in the grid
-func GetEmptyBoxes(grid [][]int) []Coord {
-	coordList := []Coord{}
+func GetEmptyBoxes(grid [][]int) []Point {
+	pointList := []Point{}
 	size := len(grid)
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if grid[i][j] == 0 {
-				coordList = append(coordList, Coord{j, i})
+				pointList = append(pointList, Point{j, i})
 			}
 		}
 	}
-	return coordList
+	return pointList
 }
