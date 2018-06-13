@@ -146,8 +146,8 @@ func TestGetEmptyBoxesShouldReturnOnlyOneCoord(t *testing.T) {
 	referenceGrid[2] = []int{8, 7, 6, 5}
 	referenceGrid[3] = []int{16, 15, 14, 13}
 	list := grid.GetEmptyBoxes(referenceGrid)
-	if (list[0] != grid.Point{3, 1, 6}) {
-		t.Errorf("List of empty boxes should contain [1,3] (" + strconv.Itoa(list[0].LinesOccupationValue) + ")")
+	if (list[0] != grid.Box{grid.Point{3, 1}, 6}) {
+		t.Errorf("List of empty boxes should contain [1,3] (" + strconv.Itoa(list[0].AlignedPieceNumber) + ")")
 	}
 }
 
@@ -221,24 +221,24 @@ func TestBoxFilledNumberShouldReturn4(t *testing.T) {
 }
 
 func TestMinOppucationValueShouldReturn3(t *testing.T) {
-	pointList := []grid.Point{grid.Point{1, 1, 5}, grid.Point{2, 2, 6}, grid.Point{0, 0, 3}, grid.Point{3, 3, 5}}
-	value := grid.MinOppucationValue(pointList)
+	boxList := []grid.Box{grid.Box{grid.Point{1, 1}, 5}, grid.Box{grid.Point{2, 2}, 6}, grid.Box{grid.Point{0, 0}, 3}, grid.Box{grid.Point{3, 3}, 5}}
+	value := grid.MinOppucationValue(boxList)
 	if value != 3 {
 		t.Errorf("Minimal occupation value should be 3 for this list of points")
 	}
 }
 
 func TestMinOppucationValueShouldReturn0(t *testing.T) {
-	pointList := []grid.Point{grid.Point{1, 1, 5}, grid.Point{2, 2, 6}, grid.Point{0, 0, 3}, grid.Point{3, 3, 0}}
-	value := grid.MinOppucationValue(pointList)
+	boxList := []grid.Box{grid.Box{grid.Point{1, 1}, 5}, grid.Box{grid.Point{2, 2}, 6}, grid.Box{grid.Point{0, 0}, 3}, grid.Box{grid.Point{3, 3}, 0}}
+	value := grid.MinOppucationValue(boxList)
 	if value != 0 {
 		t.Errorf("Minimal occupation value should be 0 for this list of points")
 	}
 }
 
 func TestMinOppucationValueShouldReturn5(t *testing.T) {
-	pointList := []grid.Point{grid.Point{1, 1, 5}, grid.Point{2, 2, 5}, grid.Point{0, 0, 5}, grid.Point{3, 3, 5}}
-	value := grid.MinOppucationValue(pointList)
+	boxList := []grid.Box{grid.Box{grid.Point{1, 1}, 5}, grid.Box{grid.Point{2, 2}, 5}, grid.Box{grid.Point{0, 0}, 5}, grid.Box{grid.Point{3, 3}, 5}}
+	value := grid.MinOppucationValue(boxList)
 	if value != 5 {
 		t.Errorf("Minimal occupation value should be 5 for this list of points")
 	}
@@ -251,10 +251,10 @@ func TestGetSafestBoxesShouldReturnListOfThreePoints(t *testing.T) {
 	referenceGrid[2] = []int{8, 0, 6, 5, 0}
 	referenceGrid[3] = []int{16, 0, 14, 0, 0}
 	referenceGrid[4] = []int{21, 23, 24, 0, 22}
-	pointList := grid.GetSafestBoxes(referenceGrid)
-	referencesPointList := []grid.Point{grid.Point{3, 0, 5}, grid.Point{4, 3, 5}, grid.Point{3, 4, 5}}
-	if !reflect.DeepEqual(pointList, referencesPointList) {
-		fmt.Println(pointList)
+	boxList := grid.GetSafestBoxes(referenceGrid)
+	referencesBoxList := []grid.Box{grid.Box{grid.Point{3, 0}, 5}, grid.Box{grid.Point{4, 3}, 5}, grid.Box{grid.Point{3, 4}, 5}}
+	if !reflect.DeepEqual(boxList, referencesBoxList) {
+		fmt.Println(boxList)
 		t.Errorf("Safest boxes should be [3, 0] and [4, 3] and [3, 4]")
 	}
 }

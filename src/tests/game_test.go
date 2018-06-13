@@ -96,7 +96,7 @@ func TestChooseRandomPositionForPieceShouldReturnFreeCoordinatesInTheGrid(t *tes
 	if coord == nil {
 		t.Errorf("Piece 5 coordinates should be in the Grid")
 	}
-	if coord.X == 0 && coord.Y == 0 {
+	if coord.Position.X == 0 && coord.Position.Y == 0 {
 		t.Errorf("Piece 5 coordinates should be in a free coordinates in the Grid")
 	}
 }
@@ -109,7 +109,7 @@ func TestChooseRandomPositionForPieceShouldReturnTheOnlyFreeCoordinatesInTheGrid
 	state.Grid[3] = []int{16, 15, 14, 13}
 	state.Piece = 12
 	coord := game.ChooseRandomPositionForPiece(state)
-	if coord.Y != 1 || coord.X != 3 {
+	if coord.Position.Y != 1 || coord.Position.X != 3 {
 		t.Errorf("Piece 12 coordinates should be in the only free coordinates in the Grid")
 	}
 }

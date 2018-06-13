@@ -7,9 +7,14 @@ import (
 
 // Point define data for a grid coordinate
 type Point struct {
-	X                    int
-	Y                    int
-	LinesOccupationValue int
+	X int
+	Y int
+}
+
+// Box define data for a grid position with evaluations among its grid
+type Box struct {
+	Position           Point
+	AlignedPieceNumber int
 }
 
 // GetNewGrid return a blank grid of defined size
@@ -114,27 +119,27 @@ func IsWinningLine(piecesLine []int) bool {
 }
 
 // GetSafestBoxes return list of boxes in the grid where grid is the less filled
-func GetSafestBoxes(grid [][]int) []Point {
-	pointList := GetEmptyBoxes(grid)
-	minValue := MinOppucationValue(pointList)
-	safestPointList := underscore.Select(pointList, func(n Point, _ int) bool {
-		return minValue == n.LinesOccupationValue
+func GetSafestBoxes(grid [][]int) []Box {
+	boxList := GetEmptyBoxes(grid)
+	minValue := MinOppucationValue(boxList)
+	safestBoxList := underscore.Select(boxList, func(n Box, _ int) bool {
+		return minValue == n.AlignedPieceNumber
 	})
-	return safestPointList.([]Point)
+	return safestBoxList.([]Box)
 }
 
 // GetEmptyBoxes return list of empty boxes in the grid
-func GetEmptyBoxes(grid [][]int) []Point {
-	pointList := []Point{}
+func GetEmptyBoxes(grid [][]int) []Box {
+	boxList := []Box{}
 	size := len(grid)
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if grid[i][j] == 0 {
-				pointList = append(pointList, Point{j, i, GetOppupationValue(grid, i, j)})
+				boxList = append(boxList, Box{Point{j, i}, GetOppupationValue(grid, i, j)})
 			}
 		}
 	}
-	return pointList
+	return boxList
 }
 
 // GetOppupationValue return an evaluation of grid occupation non lines for a given coordinate
@@ -158,10 +163,10 @@ func BoxFilledNumber(piecesLine []int) int {
 }
 
 // MinOppucationValue return the value of the min LinesOccupationValue in the list
-func MinOppucationValue(pointList []Point) int {
-	number := underscore.Reduce(pointList, func(prev int, curr Point, _ int) int {
-		if curr.LinesOccupationValue < prev {
-			return curr.LinesOccupationValue
+func MinOppucationValue(pointList []Box) int {
+	number := underscore.Reduce(pointList, func(prev int, curr Box, _ int) int {
+		if curr.AlignedPieceNumber < prev {
+			return curr.AlignedPieceNumber
 		}
 		return prev
 	}, 9999)
