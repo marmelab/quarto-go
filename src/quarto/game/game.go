@@ -45,7 +45,7 @@ func PlayTurn(state State) State {
 func PlacePieceOnGrid(state State) State {
 	newState := CopyState(state)
 	if newState.Piece > 0 {
-		coord := ChoosePositionForPiece(state)
+		coord := ChoosePositionForPiece(state).Position
 		newState.Grid[coord.Y][coord.X] = newState.Piece
 		newState.Move = [2]int{coord.Y, coord.X}
 		newState.Piece = 0
@@ -54,8 +54,11 @@ func PlacePieceOnGrid(state State) State {
 }
 
 // ChoosePositionForPiece return coordinates to place the next piece
-func ChoosePositionForPiece(state State) *grid.Point {
+func ChoosePositionForPiece(state State) *grid.Box {
 	coord := ChooseWinningPositionForPiece(state)
+	if coord == nil {
+		coord = ChooseDefensivePositionForPiece(state)
+	}
 	if coord == nil {
 		coord = ChooseRandomPositionForPiece(state)
 	}
@@ -63,24 +66,34 @@ func ChoosePositionForPiece(state State) *grid.Point {
 }
 
 // ChooseWinningPositionForPiece return first winning coordinates to place the next piece if exists
-func ChooseWinningPositionForPiece(state State) *grid.Point {
-	pointList := grid.GetEmptyBoxes(state.Grid)
-	for i := 0; i < len(pointList); i++ {
-		if grid.IsWinningPosition(pointList[i].X, pointList[i].Y, state.Grid, state.Piece) {
-			return &pointList[i]
+func ChooseWinningPositionForPiece(state State) *grid.Box {
+	boxList := grid.GetEmptyBoxes(state.Grid)
+	for i := 0; i < len(boxList); i++ {
+		if grid.IsWinningPosition(boxList[i].Position.X, boxList[i].Position.Y, state.Grid, state.Piece) {
+			return &boxList[i]
 		}
 	}
 	return nil
 }
 
-// ChooseRandomPositionForPiece return random available coordinates to place the next piece
-func ChooseRandomPositionForPiece(state State) *grid.Point {
+// ChooseDefensivePositionForPiece return available coordinates to place the next piece where grid is the less filled
+func ChooseDefensivePositionForPiece(state State) *grid.Box {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	pointList := grid.GetEmptyBoxes(state.Grid)
-	if len(pointList) == 0 {
+	boxList := grid.GetSafestBoxes(state.Grid)
+	if len(boxList) == 0 {
 		return nil
 	}
-	return &pointList[r.Intn(len(pointList))]
+	return &boxList[r.Intn(len(boxList))]
+}
+
+// ChooseRandomPositionForPiece return random available coordinates to place the next piece
+func ChooseRandomPositionForPiece(state State) *grid.Box {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	boxList := grid.GetEmptyBoxes(state.Grid)
+	if len(boxList) == 0 {
+		return nil
+	}
+	return &boxList[r.Intn(len(boxList))]
 }
 
 // DefineNewPiece select a new piece for opponent
@@ -116,10 +129,10 @@ func ChooseNonWinningPiece(state State) int {
 // GetNonWinningPiecesListFromState generate a list of pieces to play wich can't win on next turn
 func GetNonWinningPiecesListFromState(state State) []int {
 	var piecesList = GetRemainingPiecesListFromState(state)
-	pointList := grid.GetEmptyBoxes(state.Grid)
+	boxList := grid.GetEmptyBoxes(state.Grid)
 	for i := 0; i < len(piecesList); i++ {
-		for j := 0; j < len(pointList); j++ {
-			if grid.IsWinningPosition(pointList[j].X, pointList[j].Y, state.Grid, piecesList[i]) {
+		for j := 0; j < len(boxList); j++ {
+			if grid.IsWinningPosition(boxList[j].Position.X, boxList[j].Position.Y, state.Grid, piecesList[i]) {
 				piecesList = append(piecesList[:i], piecesList[i+1:]...)
 			}
 		}
