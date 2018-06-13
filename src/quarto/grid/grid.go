@@ -3,6 +3,8 @@ package grid
 import (
 	"github.com/ahl5esoft/golang-underscore"
 	"math"
+	"strconv"
+	"strings"
 )
 
 // Point define data for a grid coordinate
@@ -107,23 +109,26 @@ func IsWinningLine(piecesLine []int) bool {
 		return false
 	}
 
-	bitInverser := int(math.Pow(2, float64(len(piecesLine))) - 1)
-	propertiesAtTrue := underscore.Reduce(piecesLine, func(prev int, curr, _ int) int {
-		return prev & (curr - 1)
-	}, 1)
-
-	propertiesAtFalse := underscore.Reduce(piecesLine, func(prev int, curr, _ int) int {
-		return prev & ((curr - 1) ^ bitInverser)
-	}, 1)
-	return propertiesAtTrue != 0 || propertiesAtFalse != 0
+	return CountIdenticalCaracteristics(piecesLine, len(piecesLine)) > 0
 }
 
 // GetSafestBoxes return list of boxes in the grid where grid is the less filled
 func GetSafestBoxes(grid [][]int) []Box {
 	boxList := GetEmptyBoxes(grid)
-	minValue := MinOppucationValue(boxList)
+	minValue := MinAlignedPieceNumber(boxList)
 	safestBoxList := underscore.Select(boxList, func(n Box, _ int) bool {
 		return minValue == n.AlignedPieceNumber
+	})
+	return safestBoxList.([]Box)
+}
+
+// GetSafestBoxesIncludingPieceChoice return list of boxes in the grid where grid is the less filled with less common caracteristics
+func GetSafestBoxesIncludingPieceChoice(grid [][]int, piece int) []Box {
+	boxList := GetEmptyBoxes(grid)
+	minValue := MinPositionScoreForPiece(grid, boxList, piece)
+
+	safestBoxList := underscore.Select(boxList, func(n Box, _ int) bool {
+		return minValue == GetPositionScoreForPiece(grid, n.Position.Y, n.Position.X, piece)
 	})
 	return safestBoxList.([]Box)
 }
@@ -135,20 +140,40 @@ func GetEmptyBoxes(grid [][]int) []Box {
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if grid[i][j] == 0 {
-				boxList = append(boxList, Box{Point{j, i}, GetOppupationValue(grid, i, j)})
+				boxList = append(boxList, Box{Point{j, i}, GetAlignedPieceNumber(grid, i, j)})
 			}
 		}
 	}
 	return boxList
 }
 
-// GetOppupationValue return an evaluation of grid occupation non lines for a given coordinate
-func GetOppupationValue(grid [][]int, i int, j int) int {
+// GetAlignedPieceNumber return an evaluation of grid occupation of lines for a given coordinate
+func GetAlignedPieceNumber(grid [][]int, i int, j int) int {
 	piecesRawNumber := BoxFilledNumber(GetPiecesRaw(j, i, grid))
 	piecesColumnNumber := BoxFilledNumber(GetPiecesColumn(j, i, grid))
 	piecesSlashDiagNumber := BoxFilledNumber(GetPiecesSlashDiag(j, i, grid))
 	piecesBackSlashDiagNumber := BoxFilledNumber(GetPiecesBackSlashDiag(j, i, grid))
+
 	return piecesRawNumber + piecesColumnNumber + piecesSlashDiagNumber + piecesBackSlashDiagNumber
+}
+
+// GetPositionScoreForPiece return an evaluation of grid occupation of lines for a given coordinate and a given piece
+func GetPositionScoreForPiece(grid [][]int, i int, j int, piece int) int {
+	piecesRawNumber := BoxFilledNumber(GetPiecesRaw(j, i, grid))
+	piecesColumnNumber := BoxFilledNumber(GetPiecesColumn(j, i, grid))
+	piecesSlashDiagNumber := BoxFilledNumber(GetPiecesSlashDiag(j, i, grid))
+	piecesBackSlashDiagNumber := BoxFilledNumber(GetPiecesBackSlashDiag(j, i, grid))
+	pieceNumber := piecesRawNumber + piecesColumnNumber + piecesSlashDiagNumber + piecesBackSlashDiagNumber
+
+	newGrid := CopyGrid(grid)
+	newGrid[i][j] = piece
+	piecesRawCommonCaracteristics := CountIdenticalCaracteristics(GetPiecesRaw(j, i, newGrid), len(newGrid))
+	piecesColumnCommonCaracteristics := CountIdenticalCaracteristics(GetPiecesColumn(j, i, newGrid), len(newGrid))
+	piecesSlashDiagCommonCaracteristics := CountIdenticalCaracteristics(GetPiecesSlashDiag(j, i, newGrid), len(newGrid))
+	piecesBackSlashDiagCommonCaracteristics := CountIdenticalCaracteristics(GetPiecesBackSlashDiag(j, i, newGrid), len(newGrid))
+	commonCaracteristics := piecesRawCommonCaracteristics + piecesColumnCommonCaracteristics + piecesSlashDiagCommonCaracteristics + piecesBackSlashDiagCommonCaracteristics
+
+	return pieceNumber + commonCaracteristics
 }
 
 // BoxFilledNumber count number of filled boxes in a list
@@ -162,8 +187,8 @@ func BoxFilledNumber(piecesLine []int) int {
 	return number.(int)
 }
 
-// MinOppucationValue return the value of the min LinesOccupationValue in the list
-func MinOppucationValue(pointList []Box) int {
+// MinAlignedPieceNumber return the value of the min AlignedPieceNumber in the list
+func MinAlignedPieceNumber(pointList []Box) int {
 	number := underscore.Reduce(pointList, func(prev int, curr Box, _ int) int {
 		if curr.AlignedPieceNumber < prev {
 			return curr.AlignedPieceNumber
@@ -171,4 +196,42 @@ func MinOppucationValue(pointList []Box) int {
 		return prev
 	}, 9999)
 	return number.(int)
+}
+
+// MinPositionScoreForPiece return the value of the min position score for the given list for the given piece
+func MinPositionScoreForPiece(grid [][]int, pointList []Box, piece int) int {
+	number := underscore.Reduce(pointList, func(prev int, curr Box, _ int) int {
+		positionScore := GetPositionScoreForPiece(grid, curr.Position.Y, curr.Position.X, piece)
+		if positionScore < prev {
+			return positionScore
+		}
+		return prev
+	}, 9999)
+	return number.(int)
+}
+
+// CountIdenticalCaracteristics return the number of identicals caracteristics in a piece list for a given grid size
+func CountIdenticalCaracteristics(pieceList []int, gridSize int) int {
+	pieceListWithoutEmptyBox := underscore.Select(pieceList, func(n int, _ int) bool {
+		return n != 0
+	})
+	if pieceListWithoutEmptyBox == nil || len(pieceListWithoutEmptyBox.([]int)) < 2 {
+		return 0
+	}
+
+	bitInverser := int(math.Pow(2, float64(gridSize)) - 1)
+	propertiesAtTrue := underscore.Reduce(pieceListWithoutEmptyBox, func(prev int, curr, _ int) int {
+		return prev & (curr - 1)
+	}, bitInverser)
+
+	propertiesAtFalse := underscore.Reduce(pieceListWithoutEmptyBox, func(prev int, curr, _ int) int {
+		return prev & ((curr - 1) ^ bitInverser)
+	}, bitInverser)
+	stringReprensentationForPropertiesAtTrue := strconv.FormatInt(int64(propertiesAtTrue.(int)), 2)
+	stringReprensentationForPropertiesAtFalse := strconv.FormatInt(int64(propertiesAtFalse.(int)), 2)
+
+	numberOfCommonPropertiesAtTrue := strings.Count(stringReprensentationForPropertiesAtTrue, "1")
+	numberOfCommonPropertiesAtFalse := strings.Count(stringReprensentationForPropertiesAtFalse, "1")
+
+	return numberOfCommonPropertiesAtTrue + numberOfCommonPropertiesAtFalse
 }

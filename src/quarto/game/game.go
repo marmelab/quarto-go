@@ -79,7 +79,8 @@ func ChooseWinningPositionForPiece(state State) *grid.Box {
 // ChooseDefensivePositionForPiece return available coordinates to place the next piece where grid is the less filled
 func ChooseDefensivePositionForPiece(state State) *grid.Box {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	boxList := grid.GetSafestBoxes(state.Grid)
+	//boxList := grid.GetSafestBoxes(state.Grid)
+	boxList := grid.GetSafestBoxesIncludingPieceChoice(state.Grid, state.Piece)
 	if len(boxList) == 0 {
 		return nil
 	}
