@@ -2,26 +2,22 @@ package game
 
 import (
 	"github.com/ahl5esoft/golang-underscore"
+	"math/rand"
+	"quarto/grid"
+	"time"
 )
-
-var emptyCoord = [2]int{-1, -1}
 
 // State define data for a game state
 type State struct {
 	Grid  [][]int
 	Piece int
-	Move [2]int
+	Move  [2]int
 }
 
-// GetNewState return a blanck state of defined size
+// GetNewState return a blank state of defined size
 func GetNewState(size int) State {
 	newState := State{}
-	for i := 0; i < size; i++ {
-		newState.Grid = append(newState.Grid, []int{})
-		for j := 0; j < size; j++ {
-			newState.Grid[i] = append(newState.Grid[i], 0)
-		}
-	}
+	newState.Grid = grid.GetNewGrid(size)
 	return newState
 }
 
@@ -32,13 +28,8 @@ func GetGridSize(state State) int {
 
 // CopyState create a new state copy of the parameter
 func CopyState(state State) State {
-	size := GetGridSize(state)
-	newState := GetNewState(size)
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			newState.Grid[i][j] = state.Grid[i][j]
-		}
-	}
+	newState := GetNewState(GetGridSize(state))
+	newState.Grid = grid.CopyGrid(state.Grid)
 	newState.Piece = state.Piece
 	newState.Move = state.Move
 	return newState
@@ -47,7 +38,7 @@ func CopyState(state State) State {
 // PlayTurn return the next move for given grid
 func PlayTurn(state State) State {
 	newState := PlacePieceOnGrid(state)
-	return ChooseNewPiece(newState)
+	return DefineNewPiece(newState)
 }
 
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
@@ -55,59 +46,52 @@ func PlacePieceOnGrid(state State) State {
 	newState := CopyState(state)
 	if newState.Piece > 0 {
 		coord := ChoosePositionForPiece(state)
-		newState.Grid[coord[0]][coord[1]] = newState.Piece
-		newState.Move = coord
+		newState.Grid[coord.Y][coord.X] = newState.Piece
+		newState.Move = [2]int{coord.Y, coord.X}
 		newState.Piece = 0
 	}
 	return newState
 }
 
 // ChoosePositionForPiece return coordinates to place the next piece
-func ChoosePositionForPiece(state State) [2]int{
-	coord := ChooseWinningtPositionForPiece(state)
-	if (coord == emptyCoord) {
-		coord = ChooseFirstPositionForPiece(state)
+func ChoosePositionForPiece(state State) *grid.Point {
+	coord := ChooseWinningPositionForPiece(state)
+	if coord == nil {
+		coord = ChooseRandomPositionForPiece(state)
 	}
 	return coord
 }
 
-// ChooseWinningtPositionForPiece return first winning coordinates to place the next piece if exists
-func ChooseWinningtPositionForPiece(state State) [2]int{
-	coord := emptyCoord
-	size := GetGridSize(state)
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			if state.Grid[i][j] == 0 {
-				coord[0] = i
-				coord[1] = j
-				return coord
-			}
+// ChooseWinningPositionForPiece return first winning coordinates to place the next piece if exists
+func ChooseWinningPositionForPiece(state State) *grid.Point {
+	pointList := grid.GetEmptyBoxes(state.Grid)
+	for i := 0; i < len(pointList); i++ {
+		if grid.IsWinningPosition(pointList[i].X, pointList[i].Y, state.Grid, state.Piece) {
+			return &pointList[i]
 		}
 	}
-	return coord
+	return nil
 }
 
-// ChooseFirstPositionForPiece return first available coordinates to place the next piece
-func ChooseFirstPositionForPiece(state State) [2]int{
-	coord := emptyCoord
-	size := GetGridSize(state)
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			if state.Grid[i][j] == 0 {
-				coord[0] = i
-				coord[1] = j
-				return coord
-			}
-		}
-	}
-	return coord
+// ChooseRandomPositionForPiece return random available coordinates to place the next piece
+func ChooseRandomPositionForPiece(state State) *grid.Point {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	pointList := grid.GetEmptyBoxes(state.Grid)
+	return &pointList[r.Intn(len(pointList))]
 }
 
-// ChooseNewPiece select a new piece for opponent
-func ChooseNewPiece(state State) State {
+// DefineNewPiece select a new piece for opponent
+func DefineNewPiece(state State) State {
 	newState := CopyState(state)
-	newState.Piece = GetRemainingPiecesListFromState(newState)[0]
+	newState.Piece = ChooseRandomPiece(newState)
 	return newState
+}
+
+// ChooseRandomPiece choose a new piece for  for next opponent turn
+func ChooseRandomPiece(state State) int {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	piecesList := GetRemainingPiecesListFromState(state)
+	return piecesList[r.Intn(len(piecesList))]
 }
 
 // GetRemainingPiecesListFromState generate a list of pieces not already in the grid
@@ -141,13 +125,13 @@ func GetAllPiecesList(state State) []int {
 // IsValid return false if the state is not acceptable
 func IsValid(state State) bool {
 	size := GetGridSize(state)
-	if (!IsValidPiece(state.Piece,size)) {
+	if !IsValidPiece(state.Piece, size) {
 		return false
 	}
-	if (!IsValidGrid(state, size)) {
+	if !IsValidGrid(state, size) {
 		return false
 	}
-	if (!IsValidMove(state.Move, size)) {
+	if !IsValidMove(state.Move, size) {
 		return false
 	}
 	return true
@@ -156,22 +140,22 @@ func IsValid(state State) bool {
 // IsValidGrid return false if the piace number is not acceptable
 func IsValidGrid(state State, size int) bool {
 	var piecesList = GetAllPiecesList(state)
-	if (len(state.Grid) != size) {
+	if len(state.Grid) != size {
 		return false
 	}
 	for i := 0; i < size; i++ {
-		if (len(state.Grid[i]) != size) {
+		if len(state.Grid[i]) != size {
 			return false
 		}
 		for j := 0; j < size; j++ {
-			if (!IsValidBox(state.Grid[i][j], size, state.Piece)) {
+			if !IsValidBox(state.Grid[i][j], size, state.Piece) {
 				return false
 			}
-			if (state.Grid[i][j] > 0) {
+			if state.Grid[i][j] > 0 {
 				var pieceIndex = underscore.FindIndex(piecesList, func(n, _ int) bool {
 					return n == state.Grid[i][j]
 				})
-				if (pieceIndex < 0) {
+				if pieceIndex < 0 {
 					return false
 				}
 				piecesList = append(piecesList[:pieceIndex], piecesList[pieceIndex+1:]...)
@@ -181,17 +165,17 @@ func IsValidGrid(state State, size int) bool {
 	return true
 }
 
-// IsValidPiece return false if the piace number is not acceptable
+// IsValidPiece return false if the piece number is not acceptable
 func IsValidPiece(piece int, size int) bool {
-	return piece >= 0 && piece <= (size * size)
+	return piece >= 0 && piece <= (size*size)
 }
 
 // IsValidBox return false if the box number is not acceptable
 func IsValidBox(box int, size int, piece int) bool {
-	if (box < 0 || box > (size * size)) {
+	if box < 0 || box > (size*size) {
 		return false
 	}
-	if (piece > 0 && box == piece) {
+	if piece > 0 && box == piece {
 		return false
 	}
 	return true
@@ -199,10 +183,10 @@ func IsValidBox(box int, size int, piece int) bool {
 
 // IsValidMove return false if the move is not acceptable
 func IsValidMove(move [2]int, size int) bool {
-	if (move[0] < 0 || move[0] >= size) {
+	if move[0] < 0 || move[0] >= size {
 		return false
 	}
-	if (move[1] < 0 || move[1] >= size) {
+	if move[1] < 0 || move[1] >= size {
 		return false
 	}
 	return true
