@@ -6,6 +6,7 @@ import (
 	"quarto/state"
 	"strconv"
 	"time"
+	//"sync"
 )
 
 // StateNode define data for a node a the tree used in minmax algorithm
