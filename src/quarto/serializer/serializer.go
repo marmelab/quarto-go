@@ -2,22 +2,22 @@ package serializer
 
 import (
 	"encoding/json"
-	"quarto/game"
+	"quarto/state"
 )
 
 // FromJSONToState convert a json data into a game state
-func FromJSONToState(b []byte) (game.State, error) {
-	var state game.State
-	err := json.Unmarshal(b, &state)
+func FromJSONToState(b []byte) (state.State, error) {
+	var currentState state.State
+	err := json.Unmarshal(b, &currentState)
 	if err != nil {
-		return state, err
+		return currentState, err
 	}
-	return state, nil
+	return currentState, nil
 }
 
 // FromStateToJSON convert a game state into a json data
-func FromStateToJSON(state game.State) ([]byte, error) {
-	output, err := json.Marshal(state)
+func FromStateToJSON(currentState state.State) ([]byte, error) {
+	output, err := json.Marshal(currentState)
 	if err != nil {
 		return output, err
 	}
