@@ -11,8 +11,8 @@ import (
 
 // PlayTurn return the next move for given grid
 func PlayTurn(currentState state.State) state.State {
-	newState, done := ai.StartMiniMax(currentState, 10)
-	if (!done) {
+	newState, done := ai.StartMiniMax(currentState, 2)
+	if !done {
 		newState = PlacePieceOnGrid(currentState)
 		return DefineNewPiece(newState)
 	}

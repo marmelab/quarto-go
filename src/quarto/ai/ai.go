@@ -72,25 +72,23 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
-
 // StartMiniMax tries to perform a very good move with minimax in imparted time
 func StartMiniMax(currentState state.State, secondNumber int) (returnState state.State, err bool) {
 	newState := state.CopyState(currentState)
-	
+
 	stoppedchan := make(chan bool)
 	statechan := make(chan state.State)
 
-	go func(){ 
+	go func() {
 		time.Sleep(time.Second * time.Duration(secondNumber))
 		stoppedchan <- true
 		statechan <- currentState
 	}()
 
-	go func(){ 
-		fmt.Println("try to win")
+	go func() {
 		bestState := state.CopyState(newState)
 		bestState.Piece = 23
-
+		time.Sleep(time.Second * time.Duration(secondNumber+1))
 
 		stoppedchan <- false
 		statechan <- bestState
