@@ -290,7 +290,7 @@ func TestIsValidBoxShouldReturnTrueWhenPieceNumberAreInGridSizeAndFree(t *testin
 }
 
 func TestPlacePieceOnGridShouldPlacePieceAtX0Y3(t *testing.T) {
-	var currentState = game.GetNewState(4)
+	var currentState = state.GetNewState(4)
 	currentState.Grid[0] = []int{16, 0, 0, 0}
 	currentState.Grid[1] = []int{11, 1, 0, 0}
 	currentState.Grid[2] = []int{15, 0, 0, 3}

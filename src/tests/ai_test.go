@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func estInitAllTreeShouldReturnTree(t *testing.T) {
+func TestInitAllTreeShouldReturnTree(t *testing.T) {
 	var state = state.GetNewState(4)
 	tree := ai.InitAllTree(state)
 	fmt.Println("tree")

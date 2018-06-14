@@ -1,7 +1,6 @@
 package game
 
 import (
-	"github.com/ahl5esoft/golang-underscore"
 	"math/rand"
 	"quarto/ai"
 	"quarto/grid"
@@ -16,7 +15,8 @@ func PlayTurn(currentState state.State) state.State {
 		newState = PlacePieceOnGrid(currentState)
 		return DefineNewPiece(newState)
 	}
-	return newState
+	newState := PlacePieceOnGrid(currentState)
+	return DefineNewPiece(newState)
 }
 
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
