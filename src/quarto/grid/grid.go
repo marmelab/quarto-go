@@ -13,12 +13,6 @@ type Point struct {
 	Y int
 }
 
-// Box define data for a grid position with evaluations among its grid
-type Box struct {
-	Position           Point
-	AlignedPieceNumber int
-}
-
 // GetNewGrid return a blank grid of defined size
 func GetNewGrid(size int) [][]int {
 	newGrid := [][]int{}
@@ -112,35 +106,25 @@ func IsWinningLine(piecesLine []int) bool {
 	return CountIdenticalCaracteristics(piecesLine, len(piecesLine)) > 0
 }
 
-// GetSafestBoxes return list of boxes in the grid where grid is the less filled
-func GetSafestBoxes(grid [][]int) []Box {
-	boxList := GetEmptyBoxes(grid)
-	minValue := MinAlignedPieceNumber(boxList)
-	safestBoxList := underscore.Select(boxList, func(n Box, _ int) bool {
-		return minValue == n.AlignedPieceNumber
-	})
-	return safestBoxList.([]Box)
-}
-
 // GetSafestBoxesIncludingPieceChoice return list of boxes in the grid where grid is the less filled with less common caracteristics
-func GetSafestBoxesIncludingPieceChoice(grid [][]int, piece int) []Box {
+func GetSafestBoxesIncludingPieceChoice(grid [][]int, piece int) []Point {
 	boxList := GetEmptyBoxes(grid)
 	minValue := MinPositionScoreForPiece(grid, boxList, piece)
 
-	safestBoxList := underscore.Select(boxList, func(n Box, _ int) bool {
-		return minValue == GetPositionScoreForPiece(grid, n.Position.Y, n.Position.X, piece)
+	safestBoxList := underscore.Select(boxList, func(n Point, _ int) bool {
+		return minValue == GetPositionScoreForPiece(grid, n.Y, n.X, piece)
 	})
-	return safestBoxList.([]Box)
+	return safestBoxList.([]Point)
 }
 
 // GetEmptyBoxes return list of empty boxes in the grid
-func GetEmptyBoxes(grid [][]int) []Box {
-	boxList := []Box{}
+func GetEmptyBoxes(grid [][]int) []Point {
+	boxList := []Point{}
 	size := len(grid)
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
 			if grid[i][j] == 0 {
-				boxList = append(boxList, Box{Point{j, i}, GetAlignedPieceNumber(grid, i, j)})
+				boxList = append(boxList, Point{j, i})
 			}
 		}
 	}
@@ -187,21 +171,10 @@ func BoxFilledNumber(piecesLine []int) int {
 	return number.(int)
 }
 
-// MinAlignedPieceNumber return the value of the min AlignedPieceNumber in the list
-func MinAlignedPieceNumber(pointList []Box) int {
-	number := underscore.Reduce(pointList, func(prev int, curr Box, _ int) int {
-		if curr.AlignedPieceNumber < prev {
-			return curr.AlignedPieceNumber
-		}
-		return prev
-	}, 9999)
-	return number.(int)
-}
-
 // MinPositionScoreForPiece return the value of the min position score for the given list for the given piece
-func MinPositionScoreForPiece(grid [][]int, pointList []Box, piece int) int {
-	number := underscore.Reduce(pointList, func(prev int, curr Box, _ int) int {
-		positionScore := GetPositionScoreForPiece(grid, curr.Position.Y, curr.Position.X, piece)
+func MinPositionScoreForPiece(grid [][]int, pointList []Point, piece int) int {
+	number := underscore.Reduce(pointList, func(prev int, curr Point, _ int) int {
+		positionScore := GetPositionScoreForPiece(grid, curr.Y, curr.X, piece)
 		if positionScore < prev {
 			return positionScore
 		}

@@ -146,8 +146,8 @@ func TestGetEmptyBoxesShouldReturnOnlyOneCoord(t *testing.T) {
 	referenceGrid[2] = []int{8, 7, 6, 5}
 	referenceGrid[3] = []int{16, 15, 14, 13}
 	list := grid.GetEmptyBoxes(referenceGrid)
-	if (list[0] != grid.Box{grid.Point{3, 1}, 6}) {
-		t.Errorf("List of empty boxes should contain [1,3] (" + strconv.Itoa(list[0].AlignedPieceNumber) + ")")
+	if (list[0] != grid.Point{3, 1}) {
+		t.Errorf("List of empty boxes should contain [1,3]")
 	}
 }
 
@@ -220,45 +220,6 @@ func TestBoxFilledNumberShouldReturn4(t *testing.T) {
 	}
 }
 
-func TestMinAlignedPieceNumberShouldReturn3(t *testing.T) {
-	boxList := []grid.Box{grid.Box{grid.Point{1, 1}, 5}, grid.Box{grid.Point{2, 2}, 6}, grid.Box{grid.Point{0, 0}, 3}, grid.Box{grid.Point{3, 3}, 5}}
-	value := grid.MinAlignedPieceNumber(boxList)
-	if value != 3 {
-		t.Errorf("Minimal occupation value should be 3 for this list of points")
-	}
-}
-
-func TestMinAlignedPieceNumberShouldReturn0(t *testing.T) {
-	boxList := []grid.Box{grid.Box{grid.Point{1, 1}, 5}, grid.Box{grid.Point{2, 2}, 6}, grid.Box{grid.Point{0, 0}, 3}, grid.Box{grid.Point{3, 3}, 0}}
-	value := grid.MinAlignedPieceNumber(boxList)
-	if value != 0 {
-		t.Errorf("Minimal occupation value should be 0 for this list of points")
-	}
-}
-
-func TestMinAlignedPieceNumberShouldReturn5(t *testing.T) {
-	boxList := []grid.Box{grid.Box{grid.Point{1, 1}, 5}, grid.Box{grid.Point{2, 2}, 5}, grid.Box{grid.Point{0, 0}, 5}, grid.Box{grid.Point{3, 3}, 5}}
-	value := grid.MinAlignedPieceNumber(boxList)
-	if value != 5 {
-		t.Errorf("Minimal occupation value should be 5 for this list of points")
-	}
-}
-
-func TestGetSafestBoxesShouldReturnListOfThreePoints(t *testing.T) {
-	var referenceGrid = grid.GetNewGrid(5)
-	referenceGrid[0] = []int{1, 2, 3, 0, 17}
-	referenceGrid[1] = []int{9, 10, 11, 0, 18}
-	referenceGrid[2] = []int{8, 0, 6, 5, 0}
-	referenceGrid[3] = []int{16, 0, 14, 0, 0}
-	referenceGrid[4] = []int{21, 23, 24, 0, 22}
-	boxList := grid.GetSafestBoxes(referenceGrid)
-	referencesBoxList := []grid.Box{grid.Box{grid.Point{3, 0}, 5}, grid.Box{grid.Point{4, 3}, 5}, grid.Box{grid.Point{3, 4}, 5}}
-	if !reflect.DeepEqual(boxList, referencesBoxList) {
-		fmt.Println(boxList)
-		t.Errorf("Safest boxes should be [3, 0] and [4, 3] and [3, 4]")
-	}
-}
-
 func TestGetPositionScoreForPieceShouldReturn3(t *testing.T) {
 	var referenceGrid = grid.GetNewGrid(4)
 	referenceGrid[0] = []int{1, 0, 0, 0}
@@ -290,7 +251,7 @@ func TestGetSafestBoxesIncludingPieceChoiceShouldReturnPositionX2Y1(t *testing.T
 	referenceGrid[2] = []int{0, 9, 0, 0}
 	referenceGrid[3] = []int{0, 0, 0, 16}
 	boxList := grid.GetSafestBoxesIncludingPieceChoice(referenceGrid, 8)
-	referencesBoxList := []grid.Box{grid.Box{grid.Point{2, 1}, 1}}
+	referencesBoxList := []grid.Point{grid.Point{2, 1}}
 	if !reflect.DeepEqual(boxList, referencesBoxList) {
 		fmt.Println(boxList)
 		t.Errorf("Safest boxes should be [1, 2]")
