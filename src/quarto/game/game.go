@@ -11,8 +11,12 @@ import (
 
 // PlayTurn return the next move for given grid
 func PlayTurn(currentState state.State) state.State {
-	newState := PlacePieceOnGrid(currentState)
-	return DefineNewPiece(newState)
+	newState, done := ai.StartMiniMax(currentState, 10)
+	if (!done) {
+		newState = PlacePieceOnGrid(currentState)
+		return DefineNewPiece(newState)
+	}
+	return newState
 }
 
 // PlacePieceOnGrid add the "Piece" id in an empty place of the Grid array
@@ -32,7 +36,6 @@ func PlacePieceOnGrid(currentState state.State) state.State {
 func ChoosePositionForPiece(currentState state.State) *grid.Point {
 	coord := ChooseWinningPositionForPiece(currentState)
 	if coord == nil {
-		go ai.CountTimeElapsed(10)
 		coord = ChooseDefensivePositionForPiece(currentState)
 	}
 	if coord == nil {

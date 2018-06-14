@@ -6,6 +6,7 @@ import (
 	"quarto/state"
 	"strconv"
 	"time"
+	//"sync"
 )
 
 // StateNode define data for a node a the tree used in minmax algorithm
@@ -22,8 +23,8 @@ func InitAllTree(currentState state.State) StateNode {
 	return tree
 }
 
-func InitNode(state state.State) StateNode {
-	return StateNode{State: state, Value: 0}
+func InitNode(currentState state.State) StateNode {
+	return StateNode{State: currentState, Value: 0}
 }
 
 func AppendChildNodes(node StateNode, depth int) StateNode {
@@ -71,7 +72,32 @@ func RandStringBytes(n int) string {
 	return string(b)
 }
 
-func CountTimeElapsed(second_number int) {
-	time.Sleep(time.Second * time.Duration(second_number))
-	fmt.Println("Ended time")
+
+// StartMiniMax tries to perform a very good move with minimax in imparted time
+func StartMiniMax(currentState state.State, secondNumber int) (returnState state.State, err bool) {
+	newState := state.CopyState(currentState)
+	
+	stoppedchan := make(chan bool)
+	statechan := make(chan state.State)
+
+	go func(){ 
+		time.Sleep(time.Second * time.Duration(secondNumber))
+		stoppedchan <- true
+		statechan <- currentState
+	}()
+
+	go func(){ 
+		fmt.Println("try to win")
+		bestState := state.CopyState(newState)
+		bestState.Piece = 23
+
+
+		stoppedchan <- false
+		statechan <- bestState
+	}()
+
+	minMaxStopped := <-stoppedchan
+	newState = <-statechan
+
+	return newState, !minMaxStopped
 }
