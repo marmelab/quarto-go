@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/ahl5esoft/golang-underscore"
 	"math/rand"
 	"quarto/ai"
 	"quarto/grid"
@@ -103,14 +104,24 @@ func ChooseNonWinningPiece(currentState state.State) int {
 
 // GetNonWinningPiecesListFromState generate a list of pieces to play wich can't win on next turn
 func GetNonWinningPiecesListFromState(currentState state.State) []int {
-	var piecesList = state.GetRemainingPiecesListFromState(currentState)
+	var piecesListInitial = state.GetRemainingPiecesListFromState(currentState)
+	var piecesListWinning = []int{}
 	boxList := grid.GetEmptyBoxes(currentState.Grid)
-	for i := 0; i < len(piecesList); i++ {
+	for i := 0; i < len(piecesListInitial); i++ {
 		for j := 0; j < len(boxList); j++ {
-			if grid.IsWinningPosition(boxList[j].X, boxList[j].Y, currentState.Grid, piecesList[i]) {
-				piecesList = append(piecesList[:i], piecesList[i+1:]...)
+			if grid.IsWinningPosition(boxList[j].X, boxList[j].Y, currentState.Grid, piecesListInitial[i]) {
+				piecesListWinning = append(piecesListWinning, piecesListInitial[i])
 			}
 		}
 	}
-	return piecesList
+	var piecesListNonWinning = underscore.Select(piecesListInitial, func(ni int, _ int) bool {
+		var indexWinningPiece = underscore.FindIndex(piecesListWinning, func(nw int, _ int) bool {
+			return ni == nw
+		})
+		return indexWinningPiece < 0
+	})
+	if piecesListNonWinning == nil {
+		return []int{}
+	}
+	return piecesListNonWinning.([]int)
 }

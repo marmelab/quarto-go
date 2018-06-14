@@ -301,3 +301,15 @@ func TestPlacePieceOnGridShouldPlacePieceAtX0Y3(t *testing.T) {
 		t.Errorf("Piece should have been placed at [3,0]")
 	}
 }
+
+func TestGetNonWinningPiecesShouldReturnThePiece7(t *testing.T) {
+	var currentState = state.GetNewState(4)
+	currentState.Grid[0] = []int{11, 8, 12, 0}
+	currentState.Grid[1] = []int{6, 0, 1, 13}
+	currentState.Grid[2] = []int{9, 16, 0, 2}
+	currentState.Grid[3] = []int{15, 10, 3, 0}
+	var list = game.GetNonWinningPiecesListFromState(currentState)
+	if list[0] != 7 {
+		t.Errorf("Selection of piece should return 7")
+	}
+}
