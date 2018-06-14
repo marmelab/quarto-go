@@ -3,6 +3,7 @@ package tests
 import (
 	"quarto/game"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -146,7 +147,7 @@ func TestChooseRandomPieceShouldReturnTheOnlyAvailablePiece(t *testing.T) {
 	state.Grid[3] = []int{16, 15, 14, 13}
 	piece := game.ChooseRandomPiece(state)
 	if piece != 12 {
-		t.Errorf("piece should be 12, the only remaining piece")
+		t.Errorf("piece should be 12, the only remaining piece (" + strconv.Itoa(piece) + ")")
 	}
 }
 
@@ -157,8 +158,8 @@ func TestChooseNonWinningPieceShouldNotReturnWinningPiece(t *testing.T) {
 	state.Grid[2] = []int{8, 7, 6, 5}
 	state.Grid[3] = []int{16, 15, 14, 13}
 	piece := game.ChooseNonWinningPiece(state)
-	if piece != 12 {
-		t.Errorf("piece should be 12, the only remaining piece")
+	if piece != 0 {
+		t.Errorf("piece should be 0, cause all pieces are winning (" + strconv.Itoa(piece) + ")")
 	}
 }
 
@@ -181,8 +182,7 @@ func TestGetNonWinningPiecesShouldReturnAEmptyListWhenGameIsWonNextTurn(t *testi
 	state.Grid[2] = []int{8, 7, 6, 5}
 	state.Grid[3] = []int{16, 15, 14, 13}
 	var list = game.GetNonWinningPiecesListFromState(state)
-	var referenceList = []int{}
-	if reflect.DeepEqual(list, referenceList) {
+	if len(list) != 0 {
 		t.Errorf("Pieces list should have 0 elements when the game is lost next turn")
 	}
 }
@@ -284,5 +284,18 @@ func TestIsValidBoxShouldReturnFalseWhenPieceNumberAreNotInGridSize(t *testing.T
 func TestIsValidBoxShouldReturnTrueWhenPieceNumberAreInGridSizeAndFree(t *testing.T) {
 	if !game.IsValidBox(21, 5, 3) {
 		t.Errorf("Move should be valid (piece 21 exists one 5*5 grid)")
+	}
+}
+
+func TestPlacePieceOnGridShouldPlacePieceAtX0Y3(t *testing.T) {
+	var currentState = game.GetNewState(4)
+	currentState.Grid[0] = []int{16, 0, 0, 0}
+	currentState.Grid[1] = []int{11, 1, 0, 0}
+	currentState.Grid[2] = []int{15, 0, 0, 3}
+	currentState.Grid[3] = []int{0, 0, 9, 0}
+	currentState.Piece = 12
+	currentState = game.PlacePieceOnGrid(currentState)
+	if currentState.Grid[3][0] != 12 {
+		t.Errorf("Piece should have been placed at [3,0]")
 	}
 }
