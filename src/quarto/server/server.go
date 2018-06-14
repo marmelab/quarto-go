@@ -51,18 +51,18 @@ func SuggestMove(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		http.Error(w, "Error invalid request", 500)
+		http.Error(w, "Error : invalid request", 500)
 		return
 	}
 
 	state, err := serializer.FromJSONToState(b)
 	if !game.IsValid(state) {
-		http.Error(w, "Error invalid state in request", 500)
+		http.Error(w, "Error : invalid state in request", 500)
 		return
 	}
 
 	if err != nil {
-		http.Error(w, "Error invalid json request", 500)
+		http.Error(w, "Error : invalid json request", 500)
 		return
 	}
 
