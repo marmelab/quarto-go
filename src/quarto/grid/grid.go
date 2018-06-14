@@ -39,7 +39,7 @@ func CopyGrid(grid [][]int) [][]int {
 // IsWinningPosition return true if the piece placed at these coordinates make a winning situation
 func IsWinningPosition(x int, y int, grid [][]int, piece int) bool {
 	testGrid := CopyGrid(grid)
-	testGrid[x][y] = piece
+	testGrid[y][x] = piece
 	if IsWinningLine(GetPiecesRaw(x, y, testGrid)) {
 		return true
 	}
