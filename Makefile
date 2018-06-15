@@ -32,4 +32,13 @@ test: ## Test the code
 lint: ## Check the code syntax and rules
 	$(BIN) gofmt -w ./src
 
+build: ## Creates the executable
+	$(BIN) go build -o quarto ./src/quarto/main.go 
+
+deploy: build
+	scp -v quarto quarto-go:~/
+	ssh quarto-go  & sudo service quarto start & exit
+
+
+
 .DEFAULT_GOAL := help
