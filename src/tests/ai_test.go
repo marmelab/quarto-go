@@ -8,8 +8,10 @@ import (
 )
 
 func estInitAllTreeShouldReturnTree(t *testing.T) {
-	var state = state.GetNewState(4)
-	tree := ai.InitAllTree(state)
+	var state = state.GetNewState(2)
+	quit := make(chan struct{})
+	tree := ai.InitAllTree(state, quit)
+	close(quit)
 	fmt.Println("tree")
 	ai.PrintTree(tree, 0)
 	if 1 != 4 {

@@ -12,7 +12,7 @@ import (
 
 // PlayTurn return the next move for given grid
 func PlayTurn(currentState state.State) state.State {
-	newState, done := ai.StartMiniMax(currentState, 10)
+	newState, done := ai.StartMiniMax(currentState, 1)
 	if !done {
 		fmt.Println("minmax killed")
 		newState = PlacePieceOnGrid(currentState)

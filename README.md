@@ -32,3 +32,12 @@ Runs code linter on the project
 ```
 make lint
 ```
+
+## Deploy
+
+Deploy project on server
+  -Add ssh parameter to specify distant connection name (like make deploy sshname=quartoServer)
+
+```
+make deploy
+```

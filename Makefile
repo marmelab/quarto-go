@@ -35,10 +35,10 @@ lint: ## Check the code syntax and rules
 build: ## Creates the executable
 	$(BIN) go build -o quarto ./src/quarto/main.go 
 
-deploy: build ## Deploy on AWS
-	ssh quarto-go sudo service quarto stop
-	scp -v quarto quarto-go:~/
-	ssh quarto-go sudo service quarto start
+deploy: build ## Deploy website on Web Server (Need an sshname parameter for distant connection)
+	ssh $(sshname) sudo service quarto stop
+	scp -v quarto $(sshname):~/
+	ssh $(sshname) sudo service quarto start
 
 
 
