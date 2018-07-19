@@ -159,8 +159,8 @@ func TestChooseNonWinningPieceShouldNotReturnWinningPiece(t *testing.T) {
 	currentState.Grid[2] = []int{8, 7, 6, 5}
 	currentState.Grid[3] = []int{16, 15, 14, 13}
 	piece := game.ChooseNonWinningPiece(currentState)
-	if piece != 12 {
-		t.Errorf("piece should be 12, the only remaining piece")
+	if piece != 0 {
+		t.Errorf("piece should be O, because the only remaining piece is winning (" + strconv.Itoa(piece) + ")")
 	}
 }
 
@@ -183,9 +183,8 @@ func TestGetNonWinningPiecesShouldReturnAEmptyListWhenGameIsWonNextTurn(t *testi
 	currentState.Grid[2] = []int{8, 7, 6, 5}
 	currentState.Grid[3] = []int{16, 15, 14, 13}
 	var list = game.GetNonWinningPiecesListFromState(currentState)
-	var referenceList = []int{}
-	if reflect.DeepEqual(list, referenceList) {
-		t.Errorf("Pieces list should have 0 elements when the game is lost next turn")
+	if len(list)!= 0 {
+		t.Errorf("Pieces list should have 0 elements when the game is lost next turn (" + strconv.Itoa(len(list)) + ")")
 	}
 }
 
@@ -302,14 +301,14 @@ func TestPlacePieceOnGridShouldPlacePieceAtX0Y3(t *testing.T) {
 	}
 }
 
-func TestGetNonWinningPiecesShouldReturnThePiece7(t *testing.T) {
+func TestGetNonWinningPiecesShouldReturnNoPiece(t *testing.T) {
 	var currentState = state.GetNewState(4)
 	currentState.Grid[0] = []int{11, 8, 12, 0}
 	currentState.Grid[1] = []int{6, 0, 1, 13}
 	currentState.Grid[2] = []int{9, 16, 0, 2}
 	currentState.Grid[3] = []int{15, 10, 3, 0}
 	var list = game.GetNonWinningPiecesListFromState(currentState)
-	if list[0] != 7 {
-		t.Errorf("Selection of piece should return 7")
+	if len(list) != 0 {
+		t.Errorf("Selection of piece should return no piece , all are winning (" + strconv.Itoa(len(list)) + ")")
 	}
 }

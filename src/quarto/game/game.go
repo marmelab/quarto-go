@@ -111,7 +111,7 @@ func ChooseNonWinningPiece(currentState state.State) int {
 	return piecesList[r.Intn(len(piecesList))]
 }
 
-// GetNonWinningPiecesListFromState generate a list of pieces to play wich can't win on next turn
+// GetNonWinningPiecesListFromState generate a list of pieces to play which can't win on next turn
 func GetNonWinningPiecesListFromState(currentState state.State) []int {
 	var piecesListInitial = state.GetRemainingPiecesListFromState(currentState)
 	var piecesListWinning = []int{}
@@ -120,6 +120,7 @@ func GetNonWinningPiecesListFromState(currentState state.State) []int {
 		for j := 0; j < len(boxList); j++ {
 			if grid.IsWinningPosition(boxList[j].X, boxList[j].Y, currentState.Grid, piecesListInitial[i]) {
 				piecesListWinning = append(piecesListWinning, piecesListInitial[i])
+				break;
 			}
 		}
 	}
