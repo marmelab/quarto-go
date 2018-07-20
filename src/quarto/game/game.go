@@ -9,14 +9,14 @@ import (
 
 // PlayTurn return the next move for given grid
 func PlayTurn(currentState state.State) state.State {
-	newState, done := ai.StartMiniMax(currentState, 0)
+	newState, done := ai.StartMiniMax(currentState, 10)
 	if !done {
 		fmt.Println("minmax killed")
 		newState = PlacePieceOnGrid(currentState)
 		return DefineNewPiece(newState)
 	}
 	fmt.Println("minmax worked")
-	
+
 	return newState
 }
 

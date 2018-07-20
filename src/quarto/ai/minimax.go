@@ -17,9 +17,13 @@ type StateNode struct {
 
 // InitAllTree creates tree of possibilities
 func InitAllTree(currentState state.State, quit chan struct{}) StateNode {
+	fmt.Println("InitAllTree")
 	nextState := state.CopyState(currentState)
 	tree := InitNode(nextState)
-	tree = AppendChildNodes(tree, 2, quit)
+	fmt.Println("tree inited")
+	tree = AppendChildNodes(tree, 5, quit)
+	fmt.Println("nodes appended")
+	PrintTree(tree, 0) 
 	return tree
 }
 
@@ -28,7 +32,7 @@ func InitNode(currentState state.State) StateNode {
 	return StateNode{State: currentState, Value: 0}
 }
 
-// AppendChildNodes creates nodes of current node
+// AppendChildNodes creates child nodes of current node
 func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 	select {
 		case <-quit:
@@ -38,23 +42,35 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 				node.Childs = []StateNode{}
 				piecesList := state.GetRemainingPiecesListFromState(node.State)
 				boxList := grid.GetEmptyBoxes(node.State.Grid)
-				if len(piecesList) > 0 && len(boxList) > 0 {
-					for j := 0; j < len(piecesList); j++ {
-						if node.State.Piece == 0 {
-							nextState := state.CopyState(node.State)
-							nextState.Piece = piecesList[j]
-							childNode := InitNode(nextState)
-							node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit))
-						} else {
-							for i := 0; i < len(boxList); i++ {
+				if len(piecesList) > 1 && len(boxList) > 1 {
+					for j := 0; j < len(piecesList) ; j++ {
+						if node.State.Piece != piecesList[j] {
+							if node.State.Piece == 0 {
 								nextState := state.CopyState(node.State)
-								nextState.Grid[boxList[i].Y][boxList[i].X] = node.State.Piece
 								nextState.Piece = piecesList[j]
 								childNode := InitNode(nextState)
-								node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
+								node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit))
+							} else {
+								for i := 0; i < len(boxList); i++ {
+									nextState := state.CopyState(node.State)
+									nextState.Grid[boxList[i].Y][boxList[i].X] = node.State.Piece
+									nextState.Piece = piecesList[j]
+									childNode := InitNode(nextState)
+									if grid.IsWinningPosition(boxList[i].X, boxList[i].Y, node.State.Grid, node.State.Piece) {
+										node.Childs = append(node.Childs, childNode)
+									} else {
+										node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
+									}
+								}
 							}
 						}
 					}
+				} else if len(piecesList) == 1 && len(boxList) == 1 {
+					nextState := state.CopyState(node.State)
+					nextState.Grid[boxList[0].Y][boxList[0].X] = node.State.Piece
+					nextState.Piece = 0
+					childNode := InitNode(nextState)
+					node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
 				}
 			}
 			return node
@@ -105,6 +121,5 @@ func StartMiniMax(currentState state.State, secondNumber int) (returnState state
 	minMaxStopped := <-stoppedchan
 	newState = <-statechan
 	close(quit)
-	//False added to force fail of minmax until algorithm have been finished
-	return newState, !minMaxStopped && false
+	return newState, !minMaxStopped
 }
