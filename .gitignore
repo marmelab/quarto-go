@@ -1,2 +1,5 @@
 pkg/
+*.ods
+*.ods#
 src/github.com/
+./quarto

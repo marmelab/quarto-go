@@ -32,4 +32,14 @@ test: ## Test the code
 lint: ## Check the code syntax and rules
 	$(BIN) gofmt -w ./src
 
+build: ## Creates the executable
+	$(BIN) go build -o quarto ./src/quarto/main.go 
+
+deploy: build ## Deploy website on Web Server (Need an sshname parameter for distant connection)
+	ssh $(sshname) sudo service quarto stop
+	scp -v quarto $(sshname):~/
+	ssh $(sshname) sudo service quarto start
+
+
+
 .DEFAULT_GOAL := help

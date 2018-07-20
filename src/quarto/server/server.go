@@ -9,6 +9,7 @@ import (
 	"os"
 	"quarto/game"
 	"quarto/serializer"
+	"quarto/state"
 	"strconv"
 )
 
@@ -55,8 +56,8 @@ func SuggestMove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	state, err := serializer.FromJSONToState(b)
-	if !game.IsValid(state) {
+	currentState, err := serializer.FromJSONToState(b)
+	if !state.IsValid(currentState) {
 		http.Error(w, "Error : invalid state in request", 500)
 		return
 	}
@@ -66,7 +67,7 @@ func SuggestMove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serializedState, err := serializer.FromStateToJSON(game.PlayTurn(state))
+	serializedState, err := serializer.FromStateToJSON(game.PlayTurn(currentState))
 
 	if err != nil {
 		http.Error(w, err.Error(), 500)
