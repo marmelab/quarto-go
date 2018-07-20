@@ -12,24 +12,22 @@ import (
 type StateNode struct {
 	State  state.State
 	Value  int
+	MyNode bool
 	Childs []StateNode
 }
 
 // InitAllTree creates tree of possibilities
 func InitAllTree(currentState state.State, quit chan struct{}) StateNode {
-	fmt.Println("InitAllTree")
 	nextState := state.CopyState(currentState)
-	tree := InitNode(nextState)
-	fmt.Println("tree inited")
+	tree := InitNode(nextState, false)
 	tree = AppendChildNodes(tree, 5, quit)
-	fmt.Println("nodes appended")
 	PrintTree(tree, 0) 
 	return tree
 }
 
 // InitNode creates new node
-func InitNode(currentState state.State) StateNode {
-	return StateNode{State: currentState, Value: 0}
+func InitNode(currentState state.State, myNode bool) StateNode {
+	return StateNode{State: currentState, Value: 0, MyNode: myNode}
 }
 
 // AppendChildNodes creates child nodes of current node
@@ -48,14 +46,14 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 							if node.State.Piece == 0 {
 								nextState := state.CopyState(node.State)
 								nextState.Piece = piecesList[j]
-								childNode := InitNode(nextState)
+								childNode := InitNode(nextState, !node.MyNode)
 								node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit))
 							} else {
 								for i := 0; i < len(boxList); i++ {
 									nextState := state.CopyState(node.State)
 									nextState.Grid[boxList[i].Y][boxList[i].X] = node.State.Piece
 									nextState.Piece = piecesList[j]
-									childNode := InitNode(nextState)
+									childNode := InitNode(nextState, !node.MyNode)
 									if grid.IsWinningPosition(boxList[i].X, boxList[i].Y, node.State.Grid, node.State.Piece) {
 										node.Childs = append(node.Childs, childNode)
 									} else {
@@ -69,7 +67,7 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 					nextState := state.CopyState(node.State)
 					nextState.Grid[boxList[0].Y][boxList[0].X] = node.State.Piece
 					nextState.Piece = 0
-					childNode := InitNode(nextState)
+					childNode := InitNode(nextState, !node.MyNode)
 					node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
 				}
 			}
@@ -81,7 +79,11 @@ func PrintTree(node StateNode, depth int) {
 
 	fmt.Println(FixedStringBytes(depth*2) + " DEPTH[" + strconv.Itoa(depth) + "] / " + strconv.Itoa(len(node.Childs)) + " childs")
 	fmt.Println(node.State.Grid)
-	fmt.Println(FixedStringBytes(depth*2) + " Piece : " + strconv.Itoa(node.State.Piece) + "(value : " + strconv.Itoa(node.Value) + ")")
+	if node.MyNode {
+		fmt.Println(FixedStringBytes(depth*2) + " Piece : " + strconv.Itoa(node.State.Piece) + "(value : " + strconv.Itoa(node.Value) + " / my node)")
+	} else {
+		fmt.Println(FixedStringBytes(depth*2) + " Piece : " + strconv.Itoa(node.State.Piece) + "(value : " + strconv.Itoa(node.Value) + " / opponent node)")
+	}
 	for i := 0; i < len(node.Childs); i++ {
 		PrintTree(node.Childs[i], depth+1)
 	}
