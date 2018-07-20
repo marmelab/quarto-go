@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func estInitAllTreeShouldReturnTree(t *testing.T) {
+func TestInitAllTreeShouldReturnTree(t *testing.T) {
 	var state = state.GetNewState(2)
 	quit := make(chan struct{})
 	tree := ai.InitAllTree(state, quit)
