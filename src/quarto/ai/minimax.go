@@ -25,7 +25,6 @@ func InitAllTree(currentState state.State, quit chan struct{}) StateNode {
 	nextState := state.CopyState(currentState)
 	tree := InitNode(nextState, false)
 	tree = AppendChildNodes(tree, 5, quit)
-	PrintTree(tree, 0, 1) 
 	return tree
 }
 
@@ -97,19 +96,31 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 	}
 }
 
+func ChooseBestChildState(node StateNode) state.State {
+	value := LoosingLeafValue + 1
+	bestState := state.State{}
+	for i := 0; i < len(node.Childs); i++ {
+		if value > node.Childs[i].Value && node.Childs[i].Value != UndefinedValue {
+			value = node.Childs[i].Value
+			bestState = node.Childs[i].State
+		}
+	}
+	return bestState
+}
+
 func CalculateNodeValue(node StateNode) int {
 	value := 0
 	if node.MyNode {
 		value = WinningLeafValue
 		for i := 0; i < len(node.Childs); i++ {
-			if value < node.Childs[i].Value {
+			if value < node.Childs[i].Value && node.Childs[i].Value != UndefinedValue {
 				value = node.Childs[i].Value
 			}
 		}
 	} else {
 		value = LoosingLeafValue
 		for i := 0; i < len(node.Childs); i++ {
-			if value > node.Childs[i].Value {
+			if value > node.Childs[i].Value && node.Childs[i].Value != UndefinedValue {
 				value = node.Childs[i].Value
 			}
 		}
@@ -156,9 +167,9 @@ func StartMiniMax(currentState state.State, secondNumber int) (returnState state
 	}()
 
 	go func() {
-		bestState := state.CopyState(newState)
 
-		InitAllTree(bestState, quit)
+		tree := InitAllTree(currentState, quit)
+		bestState := ChooseBestChildState(tree)
 		
 		stoppedchan <- false
 		statechan <- bestState
