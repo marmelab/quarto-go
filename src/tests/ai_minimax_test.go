@@ -5,6 +5,7 @@ import (
 	"quarto/ai"
 	"quarto/state"
 	"testing"
+	"strconv"
 )
 
 func TestInitAllTreeShouldReturnTree(t *testing.T) {
@@ -14,7 +15,7 @@ func TestInitAllTreeShouldReturnTree(t *testing.T) {
 	close(quit)
 	fmt.Println("tree")
 	ai.PrintTree(tree, 0)
-	if 1 != 4 {
-		t.Errorf("Bad tree")
+	if tree.Value != 0 {
+		t.Errorf("Bad tree (" + strconv.Itoa(tree.Value) + ")")
 	}
 }
