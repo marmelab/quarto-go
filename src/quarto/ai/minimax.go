@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+const UndefinedValue = -1
+const WinningLeafValue = 0
+const LoosingLeafValue = 100
+
 // StateNode define data for a node a the tree used in minmax algorithm
 type StateNode struct {
 	State  state.State
@@ -21,13 +25,13 @@ func InitAllTree(currentState state.State, quit chan struct{}) StateNode {
 	nextState := state.CopyState(currentState)
 	tree := InitNode(nextState, false)
 	tree = AppendChildNodes(tree, 5, quit)
-	PrintTree(tree, 0) 
+	PrintTree(tree, 0, 1) 
 	return tree
 }
 
 // InitNode creates new node
 func InitNode(currentState state.State, myNode bool) StateNode {
-	return StateNode{State: currentState, Value: 0, MyNode: myNode}
+	return StateNode{State: currentState, Value: UndefinedValue, MyNode: myNode}
 }
 
 // AppendChildNodes creates child nodes of current node
@@ -55,6 +59,11 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 									nextState.Piece = piecesList[j]
 									childNode := InitNode(nextState, !node.MyNode)
 									if grid.IsWinningPosition(boxList[i].X, boxList[i].Y, node.State.Grid, node.State.Piece) {
+										if (childNode.MyNode) {
+											childNode.Value = WinningLeafValue
+										} else {
+											childNode.Value = LoosingLeafValue
+										}
 										node.Childs = append(node.Childs, childNode)
 									} else {
 										node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
@@ -68,14 +77,47 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 					nextState.Grid[boxList[0].Y][boxList[0].X] = node.State.Piece
 					nextState.Piece = 0
 					childNode := InitNode(nextState, !node.MyNode)
-					node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
+
+					if grid.IsWinningPosition(boxList[0].X, boxList[0].Y, node.State.Grid, node.State.Piece) {
+						if (childNode.MyNode) {
+							childNode.Value = WinningLeafValue
+						} else {
+							childNode.Value = LoosingLeafValue
+						}
+					} else {
+						childNode.Value = WinningLeafValue
+					}
+					node.Childs = append(node.Childs, childNode)
 				}
+			}
+			if (node.Value == UndefinedValue) {
+				node.Value = CalculateNodeValue(node)
 			}
 			return node
 	}
 }
 
-func PrintTree(node StateNode, depth int) {
+func CalculateNodeValue(node StateNode) int {
+	value := 0
+	if node.MyNode {
+		value = WinningLeafValue
+		for i := 0; i < len(node.Childs); i++ {
+			if value < node.Childs[i].Value {
+				value = node.Childs[i].Value
+			}
+		}
+	} else {
+		value = LoosingLeafValue
+		for i := 0; i < len(node.Childs); i++ {
+			if value > node.Childs[i].Value {
+				value = node.Childs[i].Value
+			}
+		}
+	}
+	return value
+}
+
+func PrintTree(node StateNode, depth int, maxDisplayDepth int) {
 
 	fmt.Println(FixedStringBytes(depth*2) + " DEPTH[" + strconv.Itoa(depth) + "] / " + strconv.Itoa(len(node.Childs)) + " childs")
 	fmt.Println(node.State.Grid)
@@ -84,8 +126,10 @@ func PrintTree(node StateNode, depth int) {
 	} else {
 		fmt.Println(FixedStringBytes(depth*2) + " Piece : " + strconv.Itoa(node.State.Piece) + "(value : " + strconv.Itoa(node.Value) + " / opponent node)")
 	}
-	for i := 0; i < len(node.Childs); i++ {
-		PrintTree(node.Childs[i], depth+1)
+	if (maxDisplayDepth > depth) {
+		for i := 0; i < len(node.Childs); i++ {
+			PrintTree(node.Childs[i], depth+1, maxDisplayDepth)
+		}
 	}
 }
 

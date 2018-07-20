@@ -14,8 +14,8 @@ func TestInitAllTreeShouldReturnTree(t *testing.T) {
 	tree := ai.InitAllTree(state, quit)
 	close(quit)
 	fmt.Println("tree")
-	ai.PrintTree(tree, 0)
-	if tree.Value != 0 {
+	ai.PrintTree(tree, 0, 1)
+	if tree.MyNode != false {
 		t.Errorf("Bad tree (" + strconv.Itoa(tree.Value) + ")")
 	}
 }
