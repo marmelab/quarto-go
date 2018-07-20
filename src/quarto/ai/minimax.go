@@ -105,6 +105,6 @@ func StartMiniMax(currentState state.State, secondNumber int) (returnState state
 	minMaxStopped := <-stoppedchan
 	newState = <-statechan
 	close(quit)
-
-	return newState, !minMaxStopped
+	//False added to force fail of minmax until algorithm have been finished
+	return newState, !minMaxStopped && false
 }
