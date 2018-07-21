@@ -9,14 +9,13 @@ import (
 
 // PlayTurn return the next move for given grid
 func PlayTurn(currentState state.State) state.State {
-	newState, done := ai.StartMiniMax(currentState, 10)
+	newState, done := ai.StartMiniMax(currentState, 30)
 	if !done {
 		fmt.Println("minmax killed")
 		newState = PlacePieceOnGrid(currentState)
 		return DefineNewPiece(newState)
 	}
 	fmt.Println("minmax worked")
-
 	return newState
 }
 
@@ -36,13 +35,15 @@ func PlacePieceOnGrid(currentState state.State) state.State {
 // ChoosePositionForPiece return coordinates to place the next piece
 func ChoosePositionForPiece(currentState state.State) *grid.Point {
 	coord := ai.ChooseWinningPositionForPiece(currentState)
-	if coord == nil {
-		coord = ai.ChooseDefensivePositionForPiece(currentState)
+	if coord != nil {
+		return coord
 	}
-	if coord == nil {
-		coord = ai.ChooseRandomPositionForPiece(currentState)
+	loosingBoxList := ai.GetLoosingBoxList(currentState)
+	coord = ai.ChooseDefensivePositionForPiece(currentState, loosingBoxList)
+	if coord != nil {
+		return coord
 	}
-	return coord
+	return ai.ChooseRandomPositionForPiece(currentState, loosingBoxList)
 }
 
 // DefineNewPiece select a new piece for opponent

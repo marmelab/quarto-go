@@ -114,30 +114,6 @@ func TestGetAllPiecesShouldReturnAGridSizedZeroFilledList(t *testing.T) {
 	}
 }
 
-func TestIsValidShouldReturnTrueWithGoodState(t *testing.T) {
-	var currentState = state.GetNewState(6)
-	if !state.IsValid(currentState) {
-		t.Errorf("State should be valid")
-	}
-}
-
-func TestIsValidShouldReturnFalseWithBadState(t *testing.T) {
-	var currentState = state.GetNewState(6)
-	currentState.Grid = append(currentState.Grid, []int{0, 0, 0, 0})
-	if state.IsValid(currentState) {
-		t.Errorf("State shouldn't be valid")
-	}
-}
-
-func TestIsValidShouldReturnFalseWithBadStateWithDuplicateValue(t *testing.T) {
-	var currentState = state.GetNewState(6)
-	currentState.Grid[3][0] = 21
-	currentState.Grid[2][4] = 21
-	if state.IsValid(currentState) {
-		t.Errorf("State shouldn't be valid")
-	}
-}
-
 func TestIsValidPieceShouldReturnTrueWhenPieceNumberIsInGridSize(t *testing.T) {
 	if !state.IsValidPiece(2, 6) {
 		t.Errorf("Piece id should be valid (2 is in [0, 6*6])")

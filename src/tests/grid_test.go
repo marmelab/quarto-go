@@ -8,14 +8,6 @@ import (
 	"testing"
 )
 
-func TestCopyGridShouldReturnANewGridEqualToSource(t *testing.T) {
-	var sourceGrid = grid.GetNewGrid(5)
-	var newGrid = grid.CopyGrid(sourceGrid)
-	if !reflect.DeepEqual(newGrid, sourceGrid) {
-		t.Errorf("Source grid should be equal to new grid")
-	}
-}
-
 func TestCopyGridShouldReturnANewGridNotEqualToSourceAfterChanges(t *testing.T) {
 	var sourceGrid = grid.GetNewGrid(4)
 	var newGrid = grid.CopyGrid(sourceGrid)
@@ -115,18 +107,6 @@ func TestGetPiecesBackSlashDiagShouldReturnAnEmptyArray(t *testing.T) {
 	}
 }
 
-func TestIsWinningLineShouldReturnFalseWithPieces1And4And5(t *testing.T) {
-	if grid.IsWinningLine([]int{1, 4, 5}) {
-		t.Errorf("List of pieces shouldn't be a winning line")
-	}
-}
-
-func TestIsWinningLineShouldReturnTrueWithPieces1And3And5(t *testing.T) {
-	if !grid.IsWinningLine([]int{1, 3, 5}) {
-		t.Errorf("List of pieces should be a winning line")
-	}
-}
-
 func TestIsWinningLineShouldReturnFalseWithPieces1And4And5And10(t *testing.T) {
 	if grid.IsWinningLine([]int{1, 4, 5, 10}) {
 		t.Errorf("List of pieces shouldn't be a winning line")
@@ -183,19 +163,6 @@ func TestGetAlignedPieceNumberShouldReturn0(t *testing.T) {
 	}
 }
 
-func TestGetAlignedPieceNumberShouldReturn11(t *testing.T) {
-	var referenceGrid = grid.GetNewGrid(5)
-	referenceGrid[0] = []int{1, 2, 3, 4, 17}
-	referenceGrid[1] = []int{9, 10, 11, 0, 18}
-	referenceGrid[2] = []int{8, 0, 6, 5, 0}
-	referenceGrid[3] = []int{16, 0, 14, 13, 19}
-	referenceGrid[4] = []int{21, 23, 24, 25, 22}
-	value := grid.GetAlignedPieceNumber(referenceGrid, 1, 3)
-	if value != 11 {
-		t.Errorf("Occupation value should be 11 for coordinate [1, 3] (" + strconv.Itoa(value) + ")")
-	}
-}
-
 func TestBoxFilledNumberShouldReturn3(t *testing.T) {
 	piecesList := []int{1, 2, 0, 6}
 	value := grid.BoxFilledNumber(piecesList)
@@ -227,7 +194,7 @@ func TestGetPositionScoreForPieceShouldReturn3(t *testing.T) {
 	referenceGrid[2] = []int{0, 9, 0, 0}
 	referenceGrid[3] = []int{0, 0, 0, 16}
 	value := grid.GetPositionScoreForPiece(referenceGrid, 0, 1, 8)
-	if grid.GetPositionScoreForPiece(referenceGrid, 0, 1, 8) != 3 {
+	if value != 3 {
 		t.Errorf("position score should be 3 (" + strconv.Itoa(value) + ")")
 	}
 }

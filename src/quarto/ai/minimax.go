@@ -21,10 +21,11 @@ type StateNode struct {
 }
 
 // InitAllTree creates tree of possibilities
-func InitAllTree(currentState state.State, quit chan struct{}) StateNode {
+func InitAllTree(currentState state.State, piecesList []int, boxList []grid.Point, quit chan struct{}) StateNode {
 	nextState := state.CopyState(currentState)
 	tree := InitNode(nextState, false)
-	tree = AppendChildNodes(tree, 5, quit)
+
+	tree = AppendChildNodes(tree, 15, piecesList, boxList, quit)
 	return tree
 }
 
@@ -34,15 +35,13 @@ func InitNode(currentState state.State, myNode bool) StateNode {
 }
 
 // AppendChildNodes creates child nodes of current node
-func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
+func AppendChildNodes(node StateNode, depth int, piecesList []int, boxList []grid.Point, quit chan struct{}) StateNode {
 	select {
 		case <-quit:
 			return node
 		default:
 			if depth >= 0 {
 				node.Childs = []StateNode{}
-				piecesList := state.GetRemainingPiecesListFromState(node.State)
-				boxList := grid.GetEmptyBoxes(node.State.Grid)
 				if len(piecesList) > 1 && len(boxList) > 1 {
 					for j := 0; j < len(piecesList) ; j++ {
 						if node.State.Piece != piecesList[j] {
@@ -50,11 +49,13 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 								nextState := state.CopyState(node.State)
 								nextState.Piece = piecesList[j]
 								childNode := InitNode(nextState, !node.MyNode)
-								node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit))
+								childPiecesList := grid.GetListPieceMinusPiece(piecesList, nextState.Piece)
+								node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, childPiecesList, boxList, quit))
 							} else {
 								for i := 0; i < len(boxList); i++ {
 									nextState := state.CopyState(node.State)
 									nextState.Grid[boxList[i].Y][boxList[i].X] = node.State.Piece
+									nextState.Move = [2]int{boxList[i].Y, boxList[i].X}
 									nextState.Piece = piecesList[j]
 									childNode := InitNode(nextState, !node.MyNode)
 									if grid.IsWinningPosition(boxList[i].X, boxList[i].Y, node.State.Grid, node.State.Piece) {
@@ -65,7 +66,9 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 										}
 										node.Childs = append(node.Childs, childNode)
 									} else {
-										node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, quit ))
+										childPiecesList := grid.GetListPieceMinusPiece(piecesList, nextState.Piece)
+										childBoxList := grid.GetListBoxMinusPoint(boxList, boxList[i])
+										node.Childs = append(node.Childs, AppendChildNodes(childNode, depth-1, childPiecesList, childBoxList, quit ))
 									}
 								}
 							}
@@ -74,6 +77,7 @@ func AppendChildNodes(node StateNode, depth int, quit chan struct{}) StateNode {
 				} else if len(piecesList) == 1 && len(boxList) == 1 {
 					nextState := state.CopyState(node.State)
 					nextState.Grid[boxList[0].Y][boxList[0].X] = node.State.Piece
+					nextState.Move = [2]int{boxList[0].Y, boxList[0].X}
 					nextState.Piece = 0
 					childNode := InitNode(nextState, !node.MyNode)
 
@@ -154,7 +158,12 @@ func FixedStringBytes(n int) string {
 
 // StartMiniMax tries to perform a very good move with minimax in imparted time
 func StartMiniMax(currentState state.State, secondNumber int) (returnState state.State, err bool) {
-	newState := state.CopyState(currentState)
+	piecesList := state.GetRemainingPiecesListFromState(currentState)
+	if len(piecesList) > 8 {
+		fmt.Println("minmax ignored")
+		return currentState, false
+	}
+	boxList := grid.GetEmptyBoxes(currentState.Grid)
 
 	stoppedchan := make(chan bool)
 	statechan := make(chan state.State)
@@ -168,7 +177,7 @@ func StartMiniMax(currentState state.State, secondNumber int) (returnState state
 
 	go func() {
 
-		tree := InitAllTree(currentState, quit)
+		tree := InitAllTree(currentState, piecesList, boxList, quit)
 		bestState := ChooseBestChildState(tree)
 		
 		stoppedchan <- false
@@ -176,7 +185,7 @@ func StartMiniMax(currentState state.State, secondNumber int) (returnState state
 	}()
 
 	minMaxStopped := <-stoppedchan
-	newState = <-statechan
+	newState := <-statechan
 	close(quit)
 	return newState, !minMaxStopped
 }

@@ -20,13 +20,19 @@ func ChooseWinningPositionForPiece(currentState state.State) *grid.Point {
 }
 
 // ChooseRandomPositionForPiece return random available coordinates to place the next piece
-func ChooseRandomPositionForPiece(currentState state.State) *grid.Point {
+func ChooseRandomPositionForPiece(currentState state.State, loosingBoxList []grid.Point) *grid.Point {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	boxList := grid.GetEmptyBoxes(currentState.Grid)
 	if len(boxList) == 0 {
 		return nil
 	}
-	return &boxList[r.Intn(len(boxList))]
+	nonLoosingBoxList := grid.GetListBoxAMinusListBoxB(boxList, loosingBoxList)
+
+	if len(nonLoosingBoxList) == 0 {
+		return &boxList[r.Intn(len(boxList))]
+	}
+
+	return &nonLoosingBoxList[r.Intn(len(nonLoosingBoxList))]
 }
 
 // ChooseRandomPiece choose a random piece for next opponent turn
@@ -62,14 +68,20 @@ func GetNonWinningPiecesListFromState(currentState state.State) []int {
 			}
 		}
 	}
-	var piecesListNonWinning = underscore.Select(piecesListInitial, func(ni int, _ int) bool {
-		var indexWinningPiece = underscore.FindIndex(piecesListWinning, func(nw int, _ int) bool {
-			return ni == nw
-		})
-		return indexWinningPiece < 0
+	return grid.GetListPieceAMinusListPieceB(piecesListInitial, piecesListWinning)
+}
+
+func GetLoosingBoxList(currentState state.State) []grid.Point {
+	boxList := grid.GetEmptyBoxes(currentState.Grid)
+	loosingBoxList := underscore.Select(boxList, func(ni grid.Point, _ int) bool {
+		testState := state.CopyState(currentState)
+		testState.Grid[ni.Y][ni.X] = testState.Piece
+		testState.Piece = 0
+		nonWinningPieces := GetNonWinningPiecesListFromState(testState)
+		return len(nonWinningPieces) == 0
 	})
-	if piecesListNonWinning == nil {
-		return []int{}
+	if loosingBoxList == nil {
+		return []grid.Point{}
 	}
-	return piecesListNonWinning.([]int)
+	return loosingBoxList.([]grid.Point)
 }

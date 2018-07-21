@@ -3,6 +3,7 @@ package tests
 import (
 	"quarto/ai"
 	"quarto/state"
+	"quarto/grid"
 	"reflect"
 	"strconv"
 	"testing"
@@ -11,7 +12,7 @@ import (
 func TestChooseRandomPositionForPieceShouldReturnAnyCoordinatesInTheGridWhenCalledFirst(t *testing.T) {
 	var currentState = state.GetNewState(4)
 	currentState.Piece = 3
-	coord := ai.ChooseRandomPositionForPiece(currentState)
+	coord := ai.ChooseRandomPositionForPiece(currentState, []grid.Point{})
 	if coord == nil {
 		t.Errorf("Piece 3 coordinates should be in the Grid")
 	}
@@ -21,7 +22,7 @@ func TestChooseRandomPositionForPieceShouldReturnFreeCoordinatesInTheGrid(t *tes
 	var currentState = state.GetNewState(4)
 	currentState.Grid[0][0] = 7
 	currentState.Piece = 5
-	coord := ai.ChooseRandomPositionForPiece(currentState)
+	coord := ai.ChooseRandomPositionForPiece(currentState, []grid.Point{})
 	if coord == nil {
 		t.Errorf("Piece 5 coordinates should be in the Grid")
 	}
@@ -37,7 +38,7 @@ func TestChooseRandomPositionForPieceShouldReturnTheOnlyFreeCoordinatesInTheGrid
 	currentState.Grid[2] = []int{8, 7, 6, 5}
 	currentState.Grid[3] = []int{16, 15, 14, 13}
 	currentState.Piece = 12
-	coord := ai.ChooseRandomPositionForPiece(currentState)
+	coord := ai.ChooseRandomPositionForPiece(currentState, []grid.Point{})
 	if coord.Y != 1 || coord.X != 3 {
 		t.Errorf("Piece 12 coordinates should be in the only free coordinates in the Grid")
 	}
@@ -112,5 +113,26 @@ func TestGetNonWinningPiecesShouldReturnNoPiece(t *testing.T) {
 	var list = ai.GetNonWinningPiecesListFromState(currentState)
 	if len(list) != 0 {
 		t.Errorf("Selection of piece should return no piece , all are winning (" + strconv.Itoa(len(list)) + ")")
+	}
+}
+
+
+func TestGetLoosingBoxListShouldReturnX2Y2(t *testing.T) {
+	var currentState = state.GetNewState(4)
+	currentState.Grid[0] = []int{11, 8, 12, 0}
+	currentState.Grid[1] = []int{6, 0, 1, 13}
+	currentState.Grid[2] = []int{9, 16, 0, 2}
+	currentState.Grid[3] = []int{15, 10, 3, 0}
+
+	var listResult = []grid.Point{}
+	listResult = append(listResult, grid.Point{3, 0})
+	listResult = append(listResult, grid.Point{1, 1})
+	listResult = append(listResult, grid.Point{2, 2})
+	listResult = append(listResult, grid.Point{3, 3})
+
+	var testList = ai.GetLoosingBoxList(currentState)
+
+	if !reflect.DeepEqual(testList, listResult) {
+		t.Errorf("Loosing box isn't well founded (" + strconv.Itoa(len(testList)) + ")")
 	}
 }

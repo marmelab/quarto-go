@@ -185,10 +185,9 @@ func MinPositionScoreForPiece(grid [][]int, pointList []Point, piece int) int {
 
 // CountIdenticalCaracteristics return the number of identicals caracteristics in a piece list for a given grid size
 func CountIdenticalCaracteristics(pieceList []int, gridSize int) int {
-	pieceListWithoutEmptyBox := underscore.Select(pieceList, func(n int, _ int) bool {
-		return n != 0
-	})
-	if pieceListWithoutEmptyBox == nil || len(pieceListWithoutEmptyBox.([]int)) < 2 {
+	pieceListWithoutEmptyBox := GetListPieceMinusPiece(pieceList, 0)
+
+	if len(pieceListWithoutEmptyBox) < 2 {
 		return 0
 	}
 
