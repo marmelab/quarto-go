@@ -5,7 +5,6 @@ import (
 	"quarto/state"
 	"quarto/grid"
 	"testing"
-	"fmt"
 )
 
 func TestChooseDefensivePositionForPieceShouldPlaceOnFreeCoordinatesWhenCalledFirstWithoutBadBoxList(t *testing.T) {
