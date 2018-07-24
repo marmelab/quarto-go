@@ -180,4 +180,3 @@ func TestPlacePieceOnGridShouldPlacePieceAtX0Y3(t *testing.T) {
 		t.Errorf("Piece should have been placed at [3,0]")
 	}
 }
-

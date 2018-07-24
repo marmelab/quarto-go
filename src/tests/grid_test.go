@@ -220,7 +220,6 @@ func TestGetSafestBoxesIncludingPieceChoiceShouldReturnPositionX2Y1(t *testing.T
 	boxList := grid.GetSafestBoxesIncludingPieceChoice(referenceGrid, 8)
 	referencesBoxList := []grid.Point{grid.Point{2, 1}}
 	if !reflect.DeepEqual(boxList, referencesBoxList) {
-		fmt.Println(boxList)
 		t.Errorf("Safest boxes should be [1, 2]")
 	}
 }

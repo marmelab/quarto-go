@@ -28,7 +28,7 @@ func TestGetListBoxAMinusListBoxBShouldReturnReferenceList(t *testing.T) {
 	listResult = append(listResult, grid.Point{3, 2})
 
 	var testList = grid.GetListBoxAMinusListBoxB(listA, listB)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return box list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -54,7 +54,7 @@ func TestGetListBoxAMinusEmptyListBoxBShouldReturnSameList(t *testing.T) {
 	listResult = append(listResult, grid.Point{3, 2})
 
 	var testList = grid.GetListBoxAMinusListBoxB(listA, listB)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return box list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -74,7 +74,7 @@ func TestGetEmptyListBoxAMinusListBoxBShouldEmptyList(t *testing.T) {
 	var listResult = []grid.Point{}
 
 	var testList = grid.GetListBoxAMinusListBoxB(listB, listA)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return box list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -101,7 +101,7 @@ func TestGetListPieceAMinusListPieceBShouldReturnReferenceList(t *testing.T) {
 	listResult = append(listResult, 6)
 
 	var testList = grid.GetListPieceAMinusListPieceB(listA, listB)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return piece list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -127,7 +127,7 @@ func TestGetListPieceAMinusEmptyListPieceBShouldReturnSameList(t *testing.T) {
 	listResult = append(listResult, 6)
 
 	var testList = grid.GetListPieceAMinusListPieceB(listA, listB)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return piece list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -147,7 +147,7 @@ func TestGetEmptyListPieceAMinusListPieceBShouldEmptyList(t *testing.T) {
 	var listResult = []int{}
 
 	var testList = grid.GetListPieceAMinusListPieceB(listB, listA)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return piece list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -172,7 +172,7 @@ func TestGetListBoxMinusPointShouldReturnReferenceList(t *testing.T) {
 	listResult = append(listResult, grid.Point{3, 2})
 
 	var testList = grid.GetListBoxMinusPoint(listA, point)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return box list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -198,7 +198,7 @@ func TestGetListBoxMinusPointShouldReturnSameList(t *testing.T) {
 	listResult = append(listResult, grid.Point{3, 2})
 
 	var testList = grid.GetListBoxMinusPoint(listA, point)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return box list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -223,7 +223,7 @@ func TestGetListPieceMinusPieceShouldReturnReferenceList(t *testing.T) {
 	listResult = append(listResult, 6)
 
 	var testList = grid.GetListPieceMinusPiece(listA, piece)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return piece list (" + strconv.Itoa(len(testList)) + ")")
 	}
@@ -249,7 +249,7 @@ func TestGetListPieceMinusPieceShouldReturnSameList(t *testing.T) {
 	listResult = append(listResult, 6)
 
 	var testList = grid.GetListPieceMinusPiece(listA, piece)
-	
+
 	if !reflect.DeepEqual(testList, listResult) {
 		t.Errorf("Bad return piece list (" + strconv.Itoa(len(testList)) + ")")
 	}

@@ -114,7 +114,23 @@ func GetSafestBoxesIncludingPieceChoice(grid [][]int, piece int) []Point {
 	safestBoxList := underscore.Select(boxList, func(n Point, _ int) bool {
 		return minValue == GetPositionScoreForPiece(grid, n.Y, n.X, piece)
 	})
+	if safestBoxList == nil {
+		return []Point{}
+	}
 	return safestBoxList.([]Point)
+}
+
+// GetBlockingBoxesIncludingPieceChoice return list of boxes in the grid where player can block a nearly winning line
+func GetBlockingBoxesIncludingPieceChoice(grid [][]int, piece int) []Point {
+	boxList := GetEmptyBoxes(grid)
+
+	blockingBoxList := underscore.Select(boxList, func(n Point, _ int) bool {
+		return IsBlockingPositionForPiece(grid, n.Y, n.X, piece)
+	})
+	if blockingBoxList == nil {
+		return []Point{}
+	}
+	return blockingBoxList.([]Point)
 }
 
 // GetEmptyBoxes return list of empty boxes in the grid
@@ -158,6 +174,57 @@ func GetPositionScoreForPiece(grid [][]int, i int, j int, piece int) int {
 	commonCaracteristics := piecesRawCommonCaracteristics + piecesColumnCommonCaracteristics + piecesSlashDiagCommonCaracteristics + piecesBackSlashDiagCommonCaracteristics
 
 	return pieceNumber + commonCaracteristics
+}
+
+// IsBlockingPositionForPiece return an evaluation of grid occupation of lines for a given coordinate and a given piece
+func IsBlockingPositionForPiece(grid [][]int, i int, j int, piece int) bool {
+	isBlocking := false
+	piecesRaw := GetPiecesRaw(j, i, grid)
+	// IsBlockingLineForPiece(GetPiecesRaw(j, i, grid), len(grid), piece)
+	if BoxFilledNumber(piecesRaw) == 3 && CountIdenticalCaracteristics(piecesRaw, len(grid)) > 0 {
+		isBlocking = true
+		piecesRaw = append(piecesRaw, piece)
+		if CountIdenticalCaracteristics(piecesRaw, len(grid)) > 0 {
+			return false
+		}
+	}
+	piecesColumn := GetPiecesRaw(j, i, grid)
+	if BoxFilledNumber(piecesColumn) == 3 && CountIdenticalCaracteristics(piecesColumn, len(grid)) > 0 {
+		isBlocking = true
+		piecesColumn = append(piecesColumn, piece)
+		if CountIdenticalCaracteristics(piecesColumn, len(grid)) > 0 {
+			return false
+		}
+	}
+	piecesSlashDiag := GetPiecesRaw(j, i, grid)
+	if BoxFilledNumber(piecesSlashDiag) == 3 && CountIdenticalCaracteristics(piecesSlashDiag, len(grid)) > 0 {
+		isBlocking = true
+		piecesSlashDiag = append(piecesSlashDiag, piece)
+		if CountIdenticalCaracteristics(piecesSlashDiag, len(grid)) > 0 {
+			return false
+		}
+	}
+	piecesBackSlashDiag := GetPiecesRaw(j, i, grid)
+	if BoxFilledNumber(piecesBackSlashDiag) == 3 && CountIdenticalCaracteristics(piecesBackSlashDiag, len(grid)) > 0 {
+		isBlocking = true
+		piecesBackSlashDiag = append(piecesBackSlashDiag, piece)
+		if CountIdenticalCaracteristics(piecesBackSlashDiag, len(grid)) > 0 {
+			return false
+		}
+	}
+	return isBlocking
+}
+
+func IsBlockingLineForPiece(line []int, gridSize int, piece int) bool {
+	isBlocking := false
+	if BoxFilledNumber(line) == 3 && CountIdenticalCaracteristics(line, gridSize) > 0 {
+		isBlocking = true
+		line = append(line, piece)
+		if CountIdenticalCaracteristics(line, gridSize) > 0 {
+			return false
+		}
+	}
+	return isBlocking
 }
 
 // BoxFilledNumber count number of filled boxes in a list

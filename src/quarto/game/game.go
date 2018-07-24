@@ -7,9 +7,11 @@ import (
 	"fmt"
 )
 
+const miniMaxTimeAllowed = 30
+
 // PlayTurn return the next move for given grid
 func PlayTurn(currentState state.State) state.State {
-	newState, done := ai.StartMiniMax(currentState, 30)
+	newState, done := ai.StartMiniMax(currentState, miniMaxTimeAllowed)
 	if !done {
 		fmt.Println("minmax killed")
 		newState = PlacePieceOnGrid(currentState)
@@ -34,13 +36,18 @@ func PlacePieceOnGrid(currentState state.State) state.State {
 
 // ChoosePositionForPiece return coordinates to place the next piece
 func ChoosePositionForPiece(currentState state.State) *grid.Point {
+	emptyPoint := grid.Point{-1, -1}
 	coord := ai.ChooseWinningPositionForPiece(currentState)
 	if coord != nil {
 		return coord
 	}
 	loosingBoxList := ai.GetLoosingBoxList(currentState)
+	coord = ai.ChooseBlockingPositionForPiece(currentState, loosingBoxList)
+	if *coord != emptyPoint {
+		return coord
+	}
 	coord = ai.ChooseDefensivePositionForPiece(currentState, loosingBoxList)
-	if coord != nil {
+	if *coord != emptyPoint {
 		return coord
 	}
 	return ai.ChooseRandomPositionForPiece(currentState, loosingBoxList)
