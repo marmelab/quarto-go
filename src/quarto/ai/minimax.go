@@ -86,11 +86,10 @@ func BuildNormalTurnNode(currentNode StateNode, piecesList []int, pieceIndex int
 			childNode.Value = LoosingLeafValue
 		}
 		return append(currentNode.Childs, childNode)
-	} else {
-		childPiecesList := grid.GetListPieceMinusPiece(piecesList, nextState.Piece)
-		childBoxList := grid.GetListBoxMinusPoint(boxList, boxList[boxIndex])
-		return append(currentNode.Childs, AppendChildNodes(childNode, depth-1, childPiecesList, childBoxList, quit ))
 	}
+	childPiecesList := grid.GetListPieceMinusPiece(piecesList, nextState.Piece)
+	childBoxList := grid.GetListBoxMinusPoint(boxList, boxList[boxIndex])
+	return append(currentNode.Childs, AppendChildNodes(childNode, depth-1, childPiecesList, childBoxList, quit ))
 }
 
 func BuildLastTurnNode(currentNode StateNode, boxList []grid.Point, quit chan struct{}) []StateNode {
